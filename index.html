@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceX (SPCX) — Investment Analysis</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --off-white: #f5f2ec;
+    --cream: #ede9e0;
+    --gold: #c9a84c;
+    --gold-light: #e8cd87;
+    --red: #c0392b;
+    --green: #1a6b40;
+    --mid: #6b6560;
+    --rule: rgba(201,168,76,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--off-white);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* COVER */
+  .cover {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    padding: 60px 80px;
+    background: radial-gradient(ellipse 80% 60% at 70% 40%, rgba(201,168,76,0.06) 0%, transparent 70%), var(--black);
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: 'CONFIDENTIAL';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%) rotate(-30deg);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14vw;
+    font-weight: 300;
+    color: rgba(201,168,76,0.03);
+    white-space: nowrap;
+    pointer-events: none;
+    letter-spacing: 0.5em;
+  }
+  .cover-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--gold);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    display: flex;
+    gap: 40px;
+  }
+  .cover-body { display: flex; flex-direction: column; justify-content: center; }
+  .cover-ticker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--gold);
+    letter-spacing: 0.3em;
+    margin-bottom: 20px;
+  }
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(52px, 7vw, 96px);
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+  .cover-title em { font-style: italic; color: var(--gold); }
+  .cover-sub {
+    max-width: 580px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    color: rgba(245,242,236,0.6);
+    line-height: 1.6;
+    border-left: 2px solid var(--gold);
+    padding-left: 20px;
+    margin-bottom: 48px;
+  }
+  .cover-stats {
+    display: flex;
+    gap: 48px;
+    flex-wrap: wrap;
+  }
+  .stat-box { border-top: 1px solid var(--rule); padding-top: 12px; min-width: 140px; }
+  .stat-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--mid); text-transform: uppercase; margin-bottom: 4px; }
+  .stat-val { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
+  .stat-note { font-size: 11px; color: var(--mid); margin-top: 2px; }
+  .cover-footer {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--mid);
+    letter-spacing: 0.15em;
+    border-top: 1px solid var(--rule);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* MAIN */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 80px; }
+  @media(max-width:768px){ .container { padding: 0 24px; } .cover { padding: 40px 24px; } }
+
+  /* SECTION */
+  section { padding: 70px 0; border-bottom: 1px solid rgba(245,242,236,0.07); }
+  section:last-child { border-bottom: none; }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 36px;
+  }
+  h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 21px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--off-white);
+  }
+  h3 .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    background: rgba(201,168,76,0.15);
+    color: var(--gold);
+    padding: 2px 8px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+
+  p { color: rgba(245,242,236,0.82); margin-bottom: 14px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* TWO-COL */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px; }
+  @media(max-width:768px){ .two-col, .three-col { grid-template-columns: 1fr; } }
+
+  /* FINANCIAL TABLE */
+  .fin-table { width: 100%; border-collapse: collapse; margin: 24px 0; font-family: 'IBM Plex Mono', monospace; font-size: 13px; }
+  .fin-table th { font-size: 10px; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); border-bottom: 1px solid var(--rule); padding: 10px 12px; text-align: right; }
+  .fin-table th:first-child { text-align: left; }
+  .fin-table td { padding: 10px 12px; border-bottom: 1px solid rgba(245,242,236,0.05); text-align: right; color: rgba(245,242,236,0.85); }
+  .fin-table td:first-child { text-align: left; color: var(--off-white); font-size: 12px; }
+  .fin-table tr:hover td { background: rgba(201,168,76,0.04); }
+  .fin-table .subtotal td { border-top: 1px solid var(--rule); font-weight: 500; color: var(--off-white); }
+  .fin-table .total td { border-top: 2px solid var(--gold); font-weight: 600; color: var(--gold-light); }
+  .pos { color: var(--green) !important; }
+  .neg { color: var(--red) !important; }
+  .neutral { color: rgba(245,242,236,0.5) !important; }
+
+  /* SEGMENT CARDS */
+  .seg-card {
+    background: rgba(245,242,236,0.03);
+    border: 1px solid rgba(245,242,236,0.09);
+    border-top: 3px solid;
+    padding: 24px;
+    border-radius: 2px;
+  }
+  .seg-card.space { border-top-color: #4a7fc1; }
+  .seg-card.connectivity { border-top-color: var(--gold); }
+  .seg-card.ai { border-top-color: #9b59b6; }
+  .seg-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 8px; }
+  .seg-card.space .seg-title { color: #4a7fc1; }
+  .seg-card.connectivity .seg-title { color: var(--gold); }
+  .seg-card.ai .seg-title { color: #9b59b6; }
+  .seg-rev { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 700; margin-bottom: 4px; }
+  .seg-meta { font-size: 12px; color: var(--mid); margin-bottom: 16px; }
+  .seg-metrics { display: flex; flex-direction: column; gap: 8px; }
+  .seg-metric { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 12px; border-bottom: 1px solid rgba(245,242,236,0.05); padding-bottom: 8px; }
+  .seg-metric:last-child { border-bottom: none; }
+  .seg-metric .key { color: var(--mid); font-size: 11px; }
+  .seg-metric .val { color: var(--off-white); }
+
+  /* RISK CARD */
+  .risk-card {
+    background: rgba(192,57,43,0.06);
+    border: 1px solid rgba(192,57,43,0.25);
+    padding: 20px 24px;
+    border-radius: 2px;
+    margin-bottom: 16px;
+  }
+  .risk-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.15em; color: #e74c3c; text-transform: uppercase; margin-bottom: 6px; }
+
+  /* BULL/BEAR */
+  .bb-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media(max-width:600px){ .bb-grid { grid-template-columns: 1fr; } }
+  .bull-card, .bear-card {
+    padding: 24px;
+    border-radius: 2px;
+  }
+  .bull-card { background: rgba(26,107,64,0.1); border: 1px solid rgba(26,107,64,0.3); }
+  .bear-card { background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.25); }
+  .bb-title { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 16px; }
+  .bull-card .bb-title { color: #2ecc71; }
+  .bear-card .bb-title { color: #e74c3c; }
+  .bb-item { display: flex; gap: 10px; margin-bottom: 12px; font-size: 13px; color: rgba(245,242,236,0.8); line-height: 1.5; }
+  .bb-item::before { flex-shrink: 0; margin-top: 2px; font-size: 14px; }
+  .bull-card .bb-item::before { content: '↑'; color: #2ecc71; }
+  .bear-card .bb-item::before { content: '↓'; color: #e74c3c; }
+
+  /* VERDICT */
+  .verdict-box {
+    background: linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(201,168,76,0.03) 100%);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--gold);
+    padding: 36px 40px;
+    margin-top: 32px;
+    border-radius: 2px;
+  }
+  .verdict-rating {
+    font-family: 'Playfair Display', serif;
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .verdict-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.2em; color: var(--mid); text-transform: uppercase; margin-bottom: 16px; }
+
+  /* KPI GRID */
+  .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--rule); margin: 32px 0; }
+  @media(max-width:768px){ .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--black); padding: 20px; }
+  .kpi-k { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.2em; color: var(--mid); text-transform: uppercase; margin-bottom: 6px; }
+  .kpi-v { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; line-height: 1; }
+  .kpi-c { font-size: 11px; color: var(--mid); margin-top: 4px; }
+
+  blockquote {
+    border-left: 3px solid var(--gold);
+    padding: 12px 20px;
+    margin: 20px 0;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: rgba(245,242,236,0.7);
+    background: rgba(201,168,76,0.04);
+  }
+
+  .footnote { font-size: 11px; color: var(--mid); font-family: 'IBM Plex Mono', monospace; margin-top: 8px; }
+
+  hr { border: none; border-top: 1px solid var(--rule); margin: 28px 0; }
+
+  .inline-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    background: rgba(255,255,255,0.06);
+    color: var(--mid);
+    padding: 2px 6px;
+    border-radius: 2px;
+    vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="cover">
+  <div class="cover-header">
+    <span>INVESTMENT BANKING — EQUITY RESEARCH</span>
+    <span>IPO ANALYSIS</span>
+    <span>FILED: MAY 20, 2026</span>
+  </div>
+  <div class="cover-body">
+    <div class="cover-ticker">NASDAQ: SPCX — CLASS A COMMON STOCK</div>
+    <h1 class="cover-title">Space<em>X</em><br>S-1 Analysis</h1>
+    <p class="cover-sub">A comprehensive senior investment banking review of Space Exploration Technologies Corp.'s Initial Public Offering — covering financial performance, segment analysis, valuation framework, and key risks.</p>
+    <div class="cover-stats">
+      <div class="stat-box">
+        <div class="stat-label">FY 2025 Revenue</div>
+        <div class="stat-val">$18.7B</div>
+        <div class="stat-note">+33.2% YoY</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Adj. EBITDA (2025)</div>
+        <div class="stat-val">$6.6B</div>
+        <div class="stat-note">35.3% margin</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Starlink Subscribers</div>
+        <div class="stat-val">10.3M</div>
+        <div class="stat-note">As of Mar 31, 2026</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Gross Backlog</div>
+        <div class="stat-val">$27.6B</div>
+        <div class="stat-note">As of Mar 31, 2026</div>
+      </div>
+    </div>
+  </div>
+  <div class="cover-footer">
+    <span>PREPARED BY: SENIOR INVESTMENT BANKING COVERAGE — TECHNOLOGY &amp; AEROSPACE</span>
+    <span>JUNE 2026 | FOR INSTITUTIONAL USE ONLY</span>
+  </div>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<div class="container">
+<section>
+  <div class="section-label">01 — Executive Summary</div>
+  <h2>A Civilizational-Scale Infrastructure Play</h2>
+
+  <div class="two-col" style="margin-bottom:28px;">
+    <div>
+      <p>SpaceX is unlike any company we have analyzed. Filing its S-1 on May 20, 2026, this is not a technology unicorn seeking liquidity — it is a vertically integrated builder of the physical and digital infrastructure of the next century. Founded in 2002 by Elon Musk, the company has evolved far beyond its launch-services origins into a three-segment conglomerate spanning <strong>rocketry and spacecraft (Space)</strong>, <strong>global satellite broadband (Connectivity/Starlink)</strong>, and <strong>artificial intelligence (AI/xAI/X)</strong>.</p>
+      <p>The company IPOs under the ticker <strong>SPCX</strong> on Nasdaq and Nasdaq Texas with a dual-class structure that leaves Musk in effective control via 10-votes-per-share Class B stock. Investors in Class A common stock are buying into a growth story of extraordinary ambition and genuine execution capability — but at the cost of governance, profitability clarity, and extraordinary capital intensity.</p>
+    </div>
+    <div>
+      <blockquote>"We are truly building the infrastructure of the future — from space, to connectivity, to AI."</blockquote>
+      <p>The company's most critical insight — and strongest moat — is the <em>flywheel</em>: cheap, frequent launches (Falcon 9) enable cheap satellite deployment (Starlink); Starlink generates billions in recurring cash flow that fund R&amp;D on Starship; Starship in turn further slashes launch costs. Now, with the xAI/X acquisition, that flywheel extends to AI: data from X feeds Grok, Grok drives subscriptions, and eventually orbital data centers powered by SpaceX rockets could host the world's AI compute infrastructure.</p>
+      <p>The investment case is <strong>buy the flywheel, not the current P&amp;L</strong>.</p>
+    </div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-k">Q1 2026 Revenue</div><div class="kpi-v">$4.7B</div><div class="kpi-c">+15.4% YoY</div></div>
+    <div class="kpi"><div class="kpi-k">Q1 2026 Adj. EBITDA</div><div class="kpi-v">$1.1B</div><div class="kpi-c">24.0% margin</div></div>
+    <div class="kpi"><div class="kpi-k">Q1 Net Loss</div><div class="kpi-v" style="color:var(--red)">$(4.3B)</div><div class="kpi-c">AI capex drag</div></div>
+    <div class="kpi"><div class="kpi-k">Total Debt (Mar '26)</div><div class="kpi-v">$30.3B</div><div class="kpi-c">vs $23.3B Dec '25</div></div>
+    <div class="kpi"><div class="kpi-k">Cash &amp; Equivalents</div><div class="kpi-v">$15.9B</div><div class="kpi-c">Mar 31, 2026</div></div>
+    <div class="kpi"><div class="kpi-k">AI Capex (2025)</div><div class="kpi-v">$12.7B</div><div class="kpi-c">Dominant spend</div></div>
+    <div class="kpi"><div class="kpi-k">Grok/X MAUs</div><div class="kpi-v">~550M</div><div class="kpi-c">Mar 2026; 117M AI users</div></div>
+    <div class="kpi"><div class="kpi-k">Starlink Countries</div><div class="kpi-v">164</div><div class="kpi-c">+ 30 satellite-to-mobile</div></div>
+  </div>
+</section>
+
+<!-- COMPANY OVERVIEW -->
+<section>
+  <div class="section-label">02 — Company Overview</div>
+  <h2>Three Businesses, One Flywheel</h2>
+
+  <div class="two-col">
+    <div>
+      <h3>Corporate Structure &amp; History</h3>
+      <p>Incorporated in Texas, SpaceX was founded in 2002 with the audacious goal of making life multiplanetary. Its first orbital launch success (Falcon 1) came in 2008; the first Falcon 9 flew in 2010. The pivotal strategic breakthrough was <strong>rocket reusability</strong> — landing an orbital-class booster for the first time in December 2015, slashing the cost per kilogram to orbit by approximately 85% from the historical average of $18,500/kg.</p>
+      <p>In February 2026, SpaceX completed the acquisition of xAI Holdings Corp. (which itself had acquired X/Twitter). The financial statements are retrospectively restated to reflect this combination under common control, creating a materially different entity from the SpaceX of prior years. This is critical for investors: the <em>new</em> SpaceX is simultaneously the world's dominant launch provider, the world's largest broadband satellite operator, and an AI/social media company with over 550 million monthly active users.</p>
+      <p>A <strong>5-for-1 stock split</strong> was effected on May 4, 2026. All share data in this analysis reflects the post-split basis.</p>
+    </div>
+    <div>
+      <h3>Governance &amp; Capital Structure</h3>
+      <p>The offering creates a dual-class structure. <strong>Class A</strong> carries 1 vote per share (the IPO shares). <strong>Class B</strong> carries 10 votes per share and is held by Musk. Musk will retain a commanding majority of voting power post-IPO regardless of offering size. SpaceX will be a <strong>"controlled company"</strong> under Nasdaq rules and intends to use corresponding corporate governance exemptions.</p>
+      <p>Critically, Musk's January 2026 <strong>1 billion performance-based restricted Class B shares</strong> vest against market capitalization milestones from $1.065 trillion to $6.565 trillion (in $500B increments, 12 tranches), and require the establishment of a <em>non-Earth-based data center</em> (orbital compute). This aligns — and constrains — management incentives toward the very long-duration, capital-intensive strategy the S-1 describes.</p>
+      <p>The underwriting syndicate is top-tier: Goldman Sachs, Morgan Stanley, BofA, Citi, J.P. Morgan as joint book-runners, with a further 15+ co-managers.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FINANCIAL ANALYSIS -->
+<section>
+  <div class="section-label">03 — Financial Analysis</div>
+  <h2>Starlink Carries the Company; AI Burns Cash</h2>
+
+  <h3>Consolidated Income Statement Summary</h3>
+  <table class="fin-table">
+    <thead>
+      <tr>
+        <th>$ millions</th>
+        <th>FY 2023</th>
+        <th>FY 2024</th>
+        <th>FY 2025</th>
+        <th>Q1 2025</th>
+        <th>Q1 2026</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Revenue</td><td>~$9,356</td><td>$14,015</td><td>$18,674</td><td>$4,067</td><td>$4,694</td></tr>
+      <tr><td>YoY Growth</td><td>—</td><td class="pos">+49.8%*</td><td class="pos">+33.2%</td><td>—</td><td class="pos">+15.4%</td></tr>
+      <tr><td>Cost of Revenue</td><td>—</td><td>$7,996</td><td>$9,451</td><td>—</td><td>—</td></tr>
+      <tr class="subtotal"><td>R&amp;D Expense</td><td>—</td><td>~$3,464</td><td>$8,643</td><td>—</td><td>—</td></tr>
+      <tr><td>Loss from Operations</td><td>—</td><td class="pos">+$466</td><td class="neg">$(2,589)</td><td>—</td><td class="neg">$(1,943)</td></tr>
+      <tr><td>Net Income (Loss)</td><td class="neg">$(4,628)</td><td class="pos">$791</td><td class="neg">$(4,937)</td><td class="neg">$(528)</td><td class="neg">$(4,276)</td></tr>
+      <tr class="total"><td>Adj. EBITDA (Consolidated)</td><td>—</td><td>—</td><td class="pos">$6,584</td><td>—</td><td class="pos">$1,127</td></tr>
+    </tbody>
+  </table>
+  <p class="footnote">* Connectivity growth 2024→2025 per S-1 disclosure. Consolidated 2023 revenue is an estimate; audited periods disclosed in S-1 are 2023–2025.</p>
+
+  <p>The headline story is that the company runs a highly profitable <strong>Connectivity (Starlink) core</strong>, a cash-consuming <strong>Space (Starship R&amp;D)</strong> segment, and a <strong>loss-heavy AI segment</strong> absorbing massive capital investment. The GAAP net loss figures are significantly influenced by the AI buildout and non-cash items (unrealized losses on digital assets, stock-based compensation, debt extinguishment charges of $1.5B in Q1 2026).</p>
+
+  <hr>
+
+  <h3>Segment Analysis</h3>
+  <div class="three-col" style="margin-bottom:28px;">
+    <div class="seg-card connectivity">
+      <div class="seg-title">Connectivity (Starlink)</div>
+      <div class="seg-rev">$11.4B</div>
+      <div class="seg-meta">FY 2025 Revenue • The Profit Engine</div>
+      <div class="seg-metrics">
+        <div class="seg-metric"><span class="key">Op. Income (2025)</span><span class="val" style="color:#2ecc71">+$4,423M</span></div>
+        <div class="seg-metric"><span class="key">Seg. Adj. EBITDA</span><span class="val" style="color:#2ecc71">+$7,168M</span></div>
+        <div class="seg-metric"><span class="key">EBITDA Margin</span><span class="val">62.9%</span></div>
+        <div class="seg-metric"><span class="key">Rev. Growth YoY</span><span class="val" style="color:#2ecc71">+49.8%</span></div>
+        <div class="seg-metric"><span class="key">Q1 '26 Revenue</span><span class="val">$3,257M (+31.6%)</span></div>
+        <div class="seg-metric"><span class="key">Subscribers</span><span class="val">10.3M (Mar '26)</span></div>
+        <div class="seg-metric"><span class="key">Satellites in LEO</span><span class="val">~9,600</span></div>
+        <div class="seg-metric"><span class="key">Markets</span><span class="val">164 countries</span></div>
+      </div>
+    </div>
+    <div class="seg-card space">
+      <div class="seg-title">Space (Launch)</div>
+      <div class="seg-rev">$4.1B</div>
+      <div class="seg-meta">FY 2025 Revenue • The Moat Factory</div>
+      <div class="seg-metrics">
+        <div class="seg-metric"><span class="key">Op. Loss (2025)</span><span class="val" style="color:#e74c3c">$(657)M</span></div>
+        <div class="seg-metric"><span class="key">Seg. Adj. EBITDA</span><span class="val" style="color:#2ecc71">+$653M</span></div>
+        <div class="seg-metric"><span class="key">Starship R&amp;D</span><span class="val" style="color:#e74c3c">$(3,004)M</span></div>
+        <div class="seg-metric"><span class="key">2025 Launches</span><span class="val">165 (Falcon)</span></div>
+        <div class="seg-metric"><span class="key">Mission Success</span><span class="val">>99%</span></div>
+        <div class="seg-metric"><span class="key">Global Share</span><span class="val">>80% mass to orbit</span></div>
+        <div class="seg-metric"><span class="key">Mass to Orbit '25</span><span class="val">2,213 metric tons</span></div>
+        <div class="seg-metric"><span class="key">Q1 '26 Revenue</span><span class="val">$619M (−28.4%)</span></div>
+      </div>
+    </div>
+    <div class="seg-card ai">
+      <div class="seg-title">AI (xAI / Grok / X)</div>
+      <div class="seg-rev">$3.2B</div>
+      <div class="seg-meta">FY 2025 Revenue • The High-Stakes Bet</div>
+      <div class="seg-metrics">
+        <div class="seg-metric"><span class="key">Op. Loss (2025)</span><span class="val" style="color:#e74c3c">$(6,355)M</span></div>
+        <div class="seg-metric"><span class="key">Seg. Adj. EBITDA</span><span class="val" style="color:#e74c3c">$(1,237)M</span></div>
+        <div class="seg-metric"><span class="key">Capex (2025)</span><span class="val" style="color:#e74c3c">$(12,727)M</span></div>
+        <div class="seg-metric"><span class="key">Q1 '26 Revenue</span><span class="val">$818M (+12.5%)</span></div>
+        <div class="seg-metric"><span class="key">MAUs (Mar '26)</span><span class="val">~550M combined</span></div>
+        <div class="seg-metric"><span class="key">Grok AI MAUs</span><span class="val">117M</span></div>
+        <div class="seg-metric"><span class="key">Supported Accounts</span><span class="val">>1.3B</span></div>
+        <div class="seg-metric"><span class="key">Daily Posts</span><span class="val">~350M</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h3>Starlink Deep Dive — The Cash Machine</h3>
+  <p>Starlink is the crown jewel. With a 2025 segment-adjusted EBITDA of <strong>$7.2 billion on $11.4 billion of revenue</strong> (62.9% margin), it is one of the most capital-efficient large-scale infrastructure businesses on the planet. Subscriber growth of <strong>104.7% year-over-year</strong> (Q1 2026 vs Q1 2025) remains explosive, partially offset by a 22.9% decline in average revenue per user (ARPU) driven by intentional international expansion into lower-income markets and the addition of lower-priced service tiers.</p>
+  <p>The retention statistic is remarkable: <em>since 2023, no Starlink Enterprise customer contributing more than $750,000 in annual revenue has voluntarily discontinued service.</em> This is best-in-class B2B churn — essentially zero at the enterprise tier. Total deferred revenue of <strong>$13.2 billion</strong> as of March 31, 2026 provides exceptional revenue visibility.</p>
+
+  <hr>
+
+  <h3>Balance Sheet &amp; Liquidity Snapshot (Mar 31, 2026)</h3>
+  <table class="fin-table">
+    <thead>
+      <tr><th>$ millions</th><th>Mar 31, 2026</th><th>Dec 31, 2025</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Cash &amp; Equivalents (unrestricted)</td><td>$15,852</td><td>$24,747</td></tr>
+      <tr><td>Total Cash incl. Restricted</td><td>$16,608</td><td>$25,124</td></tr>
+      <tr><td>Total Assets</td><td>~$105B est.</td><td>$102,094</td></tr>
+      <tr><td>Total Debt &amp; Finance Leases</td><td class="neg">$30,286</td><td>$23,286</td></tr>
+      <tr class="subtotal"><td>Net Debt (approx.)</td><td class="neg">~$13.7B</td><td>~$(1.8B)</td></tr>
+      <tr><td>Total Backlog</td><td>$27,621</td><td>$28,377</td></tr>
+      <tr><td>Deferred Revenue</td><td>$13,236</td><td>$12,116</td></tr>
+      <tr class="total"><td>Accumulated Deficit</td><td class="neg">$(41,311)</td><td>$(37,035)</td></tr>
+    </tbody>
+  </table>
+  <p>The balance sheet transformation between December 2025 and March 2026 is stark: total debt jumped from $23.3B to $30.3B while unrestricted cash fell from $24.7B to $15.9B, resulting in a net debt position of approximately $13.7B. This was primarily driven by gross debt financing of $22.7B offset by $18.3B in repayments (refinancing) and $16.7B of investing cash outflows — largely AI datacenter capital expenditures. The Q1 2026 AI capex alone was <strong>$7.7 billion</strong>.</p>
+  <p>Operating cash flow of $1.05B in Q1 2026 versus $16.7B of investing outflows demonstrates the fundamental mismatch: current cash generation, while genuine, is vastly insufficient to self-fund the AI buildout. SpaceX is dependent on continued access to debt and equity capital markets.</p>
+</section>
+
+<!-- COMPETITIVE MOAT -->
+<section>
+  <div class="section-label">04 — Competitive Positioning</div>
+  <h2>A 10-Year Lead, Built on Physics</h2>
+
+  <div class="two-col">
+    <div>
+      <h3>Space: Near-Unassailable Lead</h3>
+      <p>SpaceX launched <strong>165 Falcon 9 missions in 2025</strong> — more than half of all global orbital launches — while delivering over 80% of all mass to orbit. With approximately 620 total Falcon 9 orbital launches as of March 2026 and an over 99% mission success rate, the operational track record is unmatched. The first competitive booster landing came in 2015; rivals are still catching up a decade later.</p>
+      <p>The cost advantage is structural: reusable boosters (qualified for up to 40 flights, averaged over 25+ accounting useful life), recovered fairings, in-house Merlin and Raptor engine manufacturing, and extreme vertical integration have reduced cost per ton to orbit by ~85% vs. historical averages. No competitor can replicate this without years of capital and operational iteration.</p>
+      <p><strong>Starship</strong> — a fully reusable super-heavy-lift vehicle — represents the next step-function reduction, with ~150 metric ton LEO capacity vs. Falcon 9's ~23 tons. Starship R&amp;D consumed $3.0B in 2025 and $930M in Q1 2026. Successful commercialization would render the company's existing competitive moat even wider.</p>
+    </div>
+    <div>
+      <h3>Connectivity: First-Mover LEO Network Effects</h3>
+      <p>With ~9,600 satellites in LEO as of March 2026, Starlink operates the world's most advanced broadband constellation. The closest competitor (Amazon Kuiper) had not yet reached operational scale at the time of filing. The network's value compounds as more satellites are deployed: lower latency, higher capacity, better coverage. The 23,000+ inter-satellite laser mesh creates a proprietary in-space data transport layer (the "Plaser" program) that is monetizable independently.</p>
+      <p>The satellite-to-mobile constellation (~650 V1 Mobile satellites) serving ~7.4 million monthly unique devices across ~30 countries is an early-stage but strategically important optionality layer, particularly following SpaceX's acquisition of EchoStar wireless spectrum assets.</p>
+
+      <h3>AI: X Data Moat, But Competitive Market</h3>
+      <p>Grok's differentiation relies on real-time integration with X — one of the world's largest public discourse platforms. Access to ~350 million daily posts provides a freshness and breadth advantage in training and inference that pure-play AI labs cannot easily replicate. That said, the AI frontier model market is intensely competitive (OpenAI, Google, Anthropic, Meta) and model performance leadership shifts rapidly. Grok reached frontier-level scientific reasoning performance within two years of its first release, a credible achievement.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MARKET OPPORTUNITY -->
+<section>
+  <div class="section-label">05 — Market Opportunity</div>
+  <h2>$28+ Trillion TAM Across Three Vectors</h2>
+
+  <p>SpaceX's S-1 presents one of the most expansive total addressable market analyses in recent IPO history. We assess each pillar independently:</p>
+
+  <table class="fin-table" style="margin-bottom:24px;">
+    <thead>
+      <tr><th>Segment</th><th>TAM Estimate</th><th>Key Drivers</th><th>Our Assessment</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Consumer Broadband (Starlink)</td><td>$660B</td><td>1.8B global households; $31/mo avg. ARPU</td><td class="neutral">Credible long-term</td></tr>
+      <tr><td>Enterprise Broadband</td><td>$200B</td><td>Global SMB + enterprise connectivity</td><td class="neutral">Well-supported</td></tr>
+      <tr><td>Government Connectivity</td><td>$5B</td><td>Defense, classified; likely understated</td><td class="neutral">Conservative</td></tr>
+      <tr><td>Starlink Mobile (satellite-to-mobile)</td><td>$740B</td><td>8B global mobile devices; $8/mo ARPU</td><td class="neutral">Very long-term</td></tr>
+      <tr><td>AI Infrastructure (compute)</td><td>$2.4T</td><td>235GW demand by 2030; GPU rental economics</td><td class="neutral">Plausible at scale</td></tr>
+      <tr><td>AI Consumer Subscriptions</td><td>$760B</td><td>5.5B users 10+; $12/mo weighted avg.</td><td class="neutral">Market share dependent</td></tr>
+      <tr><td>Digital Advertising (X)</td><td>$600B</td><td>Global digital ad spend 2025</td><td class="neutral">Declining share of wallet</td></tr>
+      <tr><td>AI Enterprise (Macrohard etc.)</td><td>~$22T</td><td>Digital economy agentic AI</td><td class="neutral">Highly speculative</td></tr>
+      <tr class="total"><td>Total Presented TAM</td><td>>$27T</td><td>—</td><td class="pos">Exceptional optionality</td></tr>
+    </tbody>
+  </table>
+  <p>We would caution investors not to anchor on the full TAM. The more relevant nearer-term addressable market is the $870B broadband opportunity, of which Starlink's current penetration of 10.3 million subscribers represents approximately 1.2% of the company's own stated 1.8 billion household target. The runway for Connectivity revenue growth alone — compounding at current rates — provides a compelling stand-alone investment case without any assumptions about AI or interplanetary ambitions.</p>
+</section>
+
+<!-- BULL / BEAR -->
+<section>
+  <div class="section-label">06 — Bull &amp; Bear Case</div>
+  <h2>The Debate</h2>
+  <div class="bb-grid">
+    <div class="bull-card">
+      <div class="bb-title">▲ Bull Case</div>
+      <div class="bb-item">Starlink is approaching critical mass: 10.3M subscribers growing >100% YoY with industry-best retention and a 62.9% EBITDA margin. As subscriber growth compounds and ARPU stabilises, this segment alone could generate $15–20B+ EBITDA annually within 3–4 years.</div>
+      <div class="bb-item">The Starship transition is a category-creating event. A fully reusable vehicle with 150MT LEO capacity at a fraction of current launch cost would unlock orbital manufacturing, true space tourism, and — per the S-1 — millions-strong AI compute satellite constellations. No competitor has a remotely comparable vehicle in development.</div>
+      <div class="bb-item">Vertical integration across the entire stack (rockets → satellites → broadband → AI compute → frontier models → social platform) creates compound compounding that is genuinely novel. The xAI/X acquisition, at zero cash cost (common control), adds AI/data infrastructure that would cost tens of billions to replicate.</div>
+      <div class="bb-item">Government revenue (Starshield, NASA contracts, national security applications) provides a high-margin, politically durable revenue base that is structurally underdisclosed in the TAM estimates.</div>
+      <div class="bb-item">The IPO itself unlocks equity currency: SpaceX can now use listed shares for acquisitions, retain talent through liquid equity, and access capital more cheaply, reinforcing the growth cycle.</div>
+    </div>
+    <div class="bear-card">
+      <div class="bb-title">▼ Bear Case</div>
+      <div class="bb-item">The AI segment is a capital black hole: $12.7B capex in 2025 and $7.7B in Q1 2026 alone, against revenues of $3.2B and $818M respectively. There is no credible path to positive AI segment cash flow within 2–3 years. If AI compute economics deteriorate (GPU rental rate compression, hyperscaler competition), the returns on this capital deployment could be permanently impaired.</div>
+      <div class="bb-item">Governance risk is severe. Musk's 10-vote Class B structure, combined with 1 billion performance shares vesting on future market cap milestones, creates incentives that could diverge from Class A shareholder interests. His simultaneous leadership of Tesla, X, xAI (now merged), Boring Company, and Neuralink creates conflict-of-interest exposure that even the S-1 explicitly flags.</div>
+      <div class="bb-item">Starlink ARPU is declining: Q1 2026 ARPU fell 22.9% YoY due to international expansion and lower-priced plans. If this trend continues while subscriber growth decelerates (inevitable at greater scale), Connectivity segment economics could compress materially.</div>
+      <div class="bb-item">The Starship development timeline is highly uncertain. The S-1 discloses $3.0B in Starship R&amp;D in 2025 alone. If Starship commercialisation is delayed by 3–5 years beyond current expectations, the entire long-term investment thesis is deferred — while debt service obligations are not.</div>
+      <div class="bb-item">Regulatory and geopolitical overhang: ITAR restrictions, FAA launch licencing, FCC spectrum proceedings, and foreign government restrictions on Starlink connectivity all represent material tail risks. Environmental litigation over launch facilities could disrupt operational cadence.</div>
+    </div>
+  </div>
+</section>
+
+<!-- KEY RISKS -->
+<section>
+  <div class="section-label">07 — Key Risks</div>
+  <h2>Material Risk Factors</h2>
+
+  <div class="risk-card">
+    <div class="risk-title">01 — CEO Concentration &amp; Key Person Risk</div>
+    <p>Elon Musk is simultaneously CEO, CTO, and Chairman of SpaceX while leading Tesla, X (now merged into SpaceX), and multiple other ventures. The S-1 explicitly acknowledges this creates potential for divided attention, conflicts of interest, and reputational contagion. There are <em>no succession plans disclosed</em>. The 1 billion performance shares vest over market cap milestones that require Musk's continued employment — but the voting structure means shareholders have essentially no recourse if his leadership proves detrimental.</p>
+  </div>
+
+  <div class="risk-card">
+    <div class="risk-title">02 — AI Segment Financial Sustainability</div>
+    <p>The AI segment generated an operating loss of $(6.4B) in 2025 and $(2.5B) in Q1 2026. Capex of $12.7B in 2025 and $7.7B in Q1 2026 makes this the dominant capital allocation priority. The company acknowledges "a multi-year investment horizon before these deployments translate into sustained positive AI Segment Adjusted EBITDA." If AI monetization proves slower than expected, the Connectivity segment cash flows — currently ~$7.2B annual EBITDA — may be insufficient to service both AI capex and growing debt obligations.</p>
+  </div>
+
+  <div class="risk-card">
+    <div class="risk-title">03 — Leverage &amp; Debt Service</div>
+    <p>Total debt rose to $30.3B by March 31, 2026. Q1 2026 saw $1.5B in debt extinguishment losses and an $18.3B debt repayment/refinancing cycle. While the company maintains $15.9B in cash, $16.7B was consumed by investing activities in one quarter. The company is reliant on continued capital market access; any disruption (risk aversion, macro dislocation, Musk-specific reputational events) could force financially damaging asset sales or dilution.</p>
+  </div>
+
+  <div class="risk-card">
+    <div class="risk-title">04 — Regulatory &amp; Export Control Exposure</div>
+    <p>SpaceX operates under ITAR, EAR, OFAC, and FAA frameworks simultaneously. Starlink requires country-by-country regulatory approval. The S-1 discloses active litigation regarding unlicensed natural gas turbines at the Southaven, Mississippi data center. Satellite spectrum allocation is governed by FCC proceedings subject to challenge. Geopolitical shifts (export controls, sanctions) could materially restrict international operations and revenue.</p>
+  </div>
+
+  <div class="risk-card">
+    <div class="risk-title">05 — Internal Controls &amp; SOX Readiness</div>
+    <p>As a private company, SpaceX was not previously required to meet public-company internal control standards. The S-1 explicitly states that "our internal controls over financial reporting currently do not meet all of the standards contemplated by Section 404" and that the company cannot yet confirm the absence of material weaknesses. For a company reporting $18.7B in revenue across three highly complex, recently combined business segments, this is a non-trivial disclosure risk.</p>
+  </div>
+
+  <div class="risk-card">
+    <div class="risk-title">06 — X Platform Brand &amp; Advertiser Risk</div>
+    <p>Advertising revenue in the AI segment declined Q1 2026 vs. Q1 2025, described as due to an "overhaul" of the advertising approach. The X platform has experienced advertiser departures associated with content moderation controversies. With digital advertising a $600B market but one where brand safety concerns have already cost X significant share, the advertising recovery trajectory is uncertain.</p>
+  </div>
+</section>
+
+<!-- VALUATION FRAMEWORK -->
+<section>
+  <div class="section-label">08 — Valuation Framework</div>
+  <h2>How to Think About Pricing SPCX</h2>
+
+  <p>The IPO price range has not been publicly disclosed in this preliminary S-1 filing. However, we provide a framework for how institutional investors should approach valuation, given SpaceX's unique multi-segment structure.</p>
+
+  <div class="two-col">
+    <div>
+      <h3>Sum-of-the-Parts Approach</h3>
+      <p>The most analytically rigorous approach is to value each segment independently and sum them. Given the wide dispersion in segment maturity and profitability, applying a single multiple to consolidated revenue or EBITDA would be misleading.</p>
+
+      <table class="fin-table" style="font-size:12px;">
+        <thead>
+          <tr><th>Segment</th><th>2025 EBITDA</th><th>Multiple</th><th>Implied Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Connectivity (Starlink)</td><td>$7,168M</td><td>20–30x</td><td>$143–215B</td></tr>
+          <tr><td>Space (Launch + Starship option)</td><td>$653M adj.</td><td>25–50x rev.</td><td>$100–200B</td></tr>
+          <tr><td>AI (xAI + X + Compute)</td><td>$(1,237)M</td><td>3–8x revenue</td><td>$10–26B</td></tr>
+          <tr class="subtotal"><td>Gross Enterprise Value</td><td>—</td><td>—</td><td>$253–441B</td></tr>
+          <tr><td>Less: Net Debt (est.)</td><td>—</td><td>—</td><td>$(14B)</td></tr>
+          <tr class="total"><td>Equity Value Range</td><td>—</td><td>—</td><td>$239–427B</td></tr>
+        </tbody>
+      </table>
+      <p class="footnote">Illustrative only. Actual pricing will reflect book-building, market conditions, and investor appetite at IPO.</p>
+    </div>
+    <div>
+      <h3>Comparable Analysis &amp; Precedents</h3>
+      <p>No exact peer exists. Relevant analogies include:</p>
+      <ul style="padding-left:20px; color:rgba(245,242,236,0.82); margin-bottom:12px;">
+        <li style="margin-bottom:8px;"><strong>Connectivity:</strong> Comparable to a best-in-class telecom infrastructure business; SBA Communications, Crown Castle, and Viasat all trade at premium infrastructure multiples. Starlink's EBITDA margins (~63%) exceed all public broadband peers.</li>
+        <li style="margin-bottom:8px;"><strong>Launch/Space:</strong> No publicly listed pure-play at scale. United Launch Alliance and Blue Origin are private. Rocket Lab (RKLB) trades at ~10x revenue but at negligible EBITDA — SpaceX's unit economics are categorically superior.</li>
+        <li style="margin-bottom:8px;"><strong>AI:</strong> The xAI/X AI business is comparable to pre-revenue or early-revenue frontier AI labs (valued at $100B+ privately) combined with a social platform (X, which was acquired for $44B in 2022 and has declined since).</li>
+      </ul>
+      <p>Management's own Musk performance-share structure implies board-sanctioned valuation milestones beginning at <strong>$1.065 trillion</strong>. This is plausible on a 5–7 year horizon if Starlink reaches 30–40M subscribers and Starship is successfully commercialised — but represents roughly 2.5–4.5x the SOTP mid-case above, suggesting meaningful optionality premium is required to justify that figure at IPO.</p>
+    </div>
+  </div>
+
+  <div class="verdict-box">
+    <div class="verdict-rating">BUY / OVERWEIGHT</div>
+    <div class="verdict-label">Senior IB Coverage Recommendation — Long-Duration Growth Investors</div>
+    <p>SpaceX is a once-in-a-generation IPO. The Starlink business alone — a globally expanding, near-monopolistic low-Earth orbit broadband network generating ~$7.2B in annual Adjusted EBITDA and growing at 50%+ — would justify a major listed company. The Space segment's launch dominance represents a durable strategic moat with Starship as a potentially transformational asset. The AI segment is a high-risk, high-reward bet on orbital compute infrastructure that only SpaceX has the unique positioning to execute.</p>
+    <p style="margin-top:12px;">We recommend <strong>long-duration growth investors and sovereign wealth funds</strong> take significant positions at IPO. <strong>Value investors and income-oriented allocators should avoid</strong>: the company is deeply loss-making on a GAAP basis, carries $30B+ in debt, and has no dividend policy. Governance risk via the Musk controlled-company structure is material and non-negotiable.</p>
+    <p style="margin-top:12px; color:rgba(245,242,236,0.5); font-size:12px; font-family:'IBM Plex Mono',monospace;">This analysis is based solely on the information disclosed in the SpaceX S-1 Registration Statement filed May 20, 2026. It does not constitute a solicitation to buy or sell securities. All figures are as disclosed in the S-1 and have not been independently verified.</p>
+  </div>
+</section>
+
+<section style="padding-top:48px; padding-bottom:60px;">
+  <div class="section-label">Appendix — Key Operating Metrics</div>
+  <h2>Supporting Data</h2>
+  <table class="fin-table">
+    <thead>
+      <tr><th>Metric</th><th>2023</th><th>2024</th><th>2025</th><th>Q1 2026</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Mass to Orbit (metric tons)</td><td>1,210</td><td>1,699</td><td>2,213</td><td>556</td></tr>
+      <tr><td>Falcon Launches</td><td>96</td><td>134</td><td>165</td><td>40</td></tr>
+      <tr><td>Flight-Proven Booster %</td><td>~85%</td><td>~94%</td><td>95%</td><td>~95%</td></tr>
+      <tr><td>Starlink Subscribers (end)</td><td>~2.3M</td><td>~4.6M</td><td>~8.0M est.</td><td>10.3M</td></tr>
+      <tr><td>Starlink LEO Satellites</td><td>~5,000</td><td>~6,900</td><td>~9,000</td><td>~9,600</td></tr>
+      <tr><td>Countries/Markets Served</td><td>—</td><td>—</td><td>—</td><td>164</td></tr>
+      <tr><td>Grok/X MAUs (combined)</td><td>—</td><td>~520M</td><td>~550M</td><td>~550M</td></tr>
+      <tr><td>Grok AI Feature MAUs</td><td>—</td><td>—</td><td>—</td><td>117M</td></tr>
+      <tr><td>Operating Cash Flow</td><td>$4,520M</td><td>$5,776M</td><td>$6,785M</td><td>$1,047M</td></tr>
+      <tr><td>Total Capex</td><td>—</td><td>—</td><td>~$20,737M</td><td>~$10,107M</td></tr>
+    </tbody>
+  </table>
+  <p class="footnote" style="margin-top:16px;">Sources: SpaceX S-1 Registration Statement, Form S-1, filed with the SEC May 20, 2026. All figures as reported or derived from disclosures therein. This document is prepared for information purposes only. Past performance is not indicative of future results.</p>
+</section>
+</div>
+
+</body>
+</html>
