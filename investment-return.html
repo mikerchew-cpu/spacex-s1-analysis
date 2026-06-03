@@ -325,8 +325,9 @@ function recalc() {
 }
 
 function renderChart(entry, inv, exitP) {
+  if (typeof Chart === 'undefined') return;
   const ctx = document.getElementById('valChart').getContext('2d');
-  if (chartInst) chartInst.destroy();
+  if (chartInst) { chartInst.destroy(); chartInst = null; }
 
   const prices = TIMELINE.map(t => t.price === 27.50 ? entry : t.price);
   prices[5] = exitP;
