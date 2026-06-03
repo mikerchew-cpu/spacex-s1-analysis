@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceX (SPCX) — Investment Return Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --off-white: #f5f2ec;
+    --cream: #ede9e0;
+    --gold: #c9a84c;
+    --gold-light: #e8cd87;
+    --red: #c0392b;
+    --green: #1a6b40;
+    --mid: #6b6560;
+    --rule: rgba(201,168,76,0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--off-white);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 80px; }
+  @media(max-width:768px){ .container { padding: 0 24px; } }
+
+  section { padding: 70px 0; }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 36px;
+  }
+
+  .hero {
+    background: rgba(245,242,236,0.03);
+    border: 1px solid rgba(245,242,236,0.09);
+    border-top: 3px solid var(--gold);
+    border-radius: 2px;
+    padding: 28px 32px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .hero-label { font-size: 11px; color: var(--mid); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 4px; }
+  .hero-val { font-size: 44px; font-weight: 500; line-height: 1; }
+  .hero-val.green { color: var(--green); }
+  .hero-sub { font-size: 13px; color: var(--mid); margin-top: 6px; }
+  .badge { display: inline-block; padding: 4px 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; border-radius: 2px; }
+  .badge.green { background: rgba(26,107,64,0.2); color: #2ecc71; }
+
+  .sec-hd {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--mid);
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 6px;
+    margin: 1.5rem 0 0.75rem;
+  }
+  .cards4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 1rem; }
+  .mc { background: rgba(245,242,236,0.03); border: 1px solid rgba(245,242,236,0.09); border-radius: 2px; padding: 14px 16px; }
+  .mc .lbl { font-size: 11px; color: var(--mid); margin-bottom: 4px; font-family: 'IBM Plex Mono', monospace; }
+  .mc .v { font-size: 18px; font-weight: 500; }
+  .mc .s { font-size: 11px; color: var(--mid); margin-top: 2px; }
+
+  .timeline { position: relative; padding: 0; margin: 0 0 1.5rem; }
+  .tl-item { display: flex; gap: 16px; padding-bottom: 20px; position: relative; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-dot-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+  .tl-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; border: 2px solid; }
+  .tl-line { flex: 1; width: 1px; background: var(--rule); margin-top: 4px; }
+  .tl-item:last-child .tl-line { display: none; }
+  .tl-content { flex: 1; }
+  .tl-date { font-size: 11px; color: var(--mid); margin-bottom: 2px; font-family: 'IBM Plex Mono', monospace; }
+  .tl-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .tl-desc { font-size: 12px; color: rgba(245,242,236,0.6); line-height: 1.5; }
+  .tl-price { font-size: 12px; font-weight: 500; font-family: 'IBM Plex Mono', monospace; }
+
+  .ctrl-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .ctrl-row label { font-size: 12px; color: var(--mid); min-width: 200px; display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; }
+  .ctrl-row label span { font-weight: 500; color: var(--off-white); }
+  .ctrl-row input[type=range] { flex: 1; accent-color: var(--gold); }
+
+  .breakdown { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'IBM Plex Mono', monospace; }
+  .breakdown th { font-size: 10px; color: var(--mid); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule); font-weight: 500; letter-spacing: 0.05em; }
+  .breakdown th:not(:first-child) { text-align: right; }
+  .breakdown td { padding: 8px 12px; border-bottom: 1px solid rgba(245,242,236,0.05); color: var(--off-white); }
+  .breakdown td:not(:first-child) { text-align: right; }
+  .breakdown tr.total td { font-weight: 600; background: rgba(201,168,76,0.04); border-top: 1px solid var(--rule); }
+  .breakdown .pos { color: #2ecc71; }
+  .breakdown .neg { color: #e74c3c; }
+
+  .chart-wrap { position: relative; width: 100%; height: 260px; margin-bottom: 1rem; border: 1px solid rgba(245,242,236,0.06); border-radius: 2px; padding: 16px; }
+
+  .risk-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+  @media(max-width:500px){ .risk-row { grid-template-columns: 1fr; } }
+  .risk-card { border-radius: 2px; padding: 16px 18px; font-size: 12px; line-height: 1.6; }
+  .risk-card.bull { background: rgba(26,107,64,0.1); border: 1px solid rgba(26,107,64,0.3); color: rgba(245,242,236,0.85); }
+  .risk-card.bear { background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.25); color: rgba(245,242,236,0.85); }
+  .risk-card .rh { font-weight: 500; font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 6px; font-family: 'IBM Plex Mono', monospace; }
+  .risk-card.bull .rh { color: #2ecc71; }
+  .risk-card.bear .rh { color: #e74c3c; }
+
+  .note { font-size: 11px; color: var(--mid); line-height: 1.6; padding: 14px 18px; background: rgba(245,242,236,0.03); border: 1px solid rgba(245,242,236,0.06); border-radius: 2px; margin-top: 1rem; font-family: 'IBM Plex Mono', monospace; }
+
+  p { color: rgba(245,242,236,0.82); margin-bottom: 14px; }
+
+  blockquote {
+    border-left: 3px solid var(--gold);
+    padding: 12px 20px;
+    margin: 20px 0;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: rgba(245,242,236,0.7);
+    background: rgba(201,168,76,0.04);
+  }
+
+  .nav-link {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    border: 1px solid var(--rule);
+    padding: 8px 16px;
+    border-radius: 2px;
+    margin-bottom: 20px;
+    transition: background 0.2s;
+  }
+  .nav-link:hover { background: rgba(201,168,76,0.08); }
+</style>
+</head>
+<body>
+
+<div class="container">
+<section>
+  <a class="nav-link" href="index.html">← Back to S-1 Analysis</a>
+  <div class="section-label">SpaceX IPO — Investment Return Calculator</div>
+  <h2>What Your November 2025 Investment Is Worth Today</h2>
+
+  <blockquote>Use the sliders below to adjust entry price, investment amount, and exit price. See how the SPCX IPO return stacks up.</blockquote>
+
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-label">Your $1,000,000 invested in Nov 2025 is worth today</div>
+      <div class="hero-val green" id="heroVal">$4,910,000</div>
+      <div class="hero-sub" id="heroSub">At IPO pricing of $135/share &nbsp;·&nbsp; Gain: $3,910,000 &nbsp;·&nbsp; Return: +391%</div>
+    </div>
+    <div>
+      <span class="badge green" id="heroBadge">+391% in ~7 months</span>
+    </div>
+  </div>
+
+  <div class="sec-hd">Entry vs. today — price milestones</div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-dot-wrap"><div class="tl-dot" style="background:var(--mid);border-color:var(--mid)"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-date">July 2025</div>
+        <div class="tl-title">Secondary tender offer</div>
+        <div class="tl-desc">SpaceX insider share sale at $212/share, valuing the company at ~$400B. Pre-5-for-1 stock split equivalent = $42.40/share post-split.</div>
+        <div class="tl-price" style="color:var(--mid)">$212/share pre-split · ~$42.40 post-split adjusted · $400B valuation</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot-wrap"><div class="tl-dot" style="background:#BA7517;border-color:#BA7517"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-date">November 2025 — <strong>Your entry</strong></div>
+        <div class="tl-title">Secondary market purchase (~$224–255/share pre-split)</div>
+        <div class="tl-desc">Forge Global quoted ~$224/share on Nov 19–20, 2025. Company was in discussions for secondary sale targeting ~$255B (pre-split per-share equivalent). Post-split adjusted entry = ~$27.50/share. We use $27.50/share post-split as the base entry for this analysis, implying ~$500–510B company valuation at time of your purchase.</div>
+        <div class="tl-price" style="color:#BA7517">~$224–255/share pre-split · ~$27.50/share post-split · ~$500–510B valuation</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot-wrap"><div class="tl-dot" style="background:#639922;border-color:#639922"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-date">December 2025</div>
+        <div class="tl-title">$800B tender offer — $421/share pre-split</div>
+        <div class="tl-desc">SpaceX CFO confirmed insider share sale at $421/share, nearly doubling the company valuation. Post-split equivalent = $84.20/share. Your investment nearly triples in weeks.</div>
+        <div class="tl-price" style="color:#639922">$421/share pre-split · $84.20/share post-split · $800B valuation</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot-wrap"><div class="tl-dot" style="background:#639922;border-color:#639922"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-date">February 2026</div>
+        <div class="tl-title">xAI merger — combined valuation ~$1.25T</div>
+        <div class="tl-desc">SpaceX acquires xAI in all-stock deal at $1T SpaceX + $250B xAI = $1.25T combined entity. Post-split equivalent ~$95–100/share.</div>
+        <div class="tl-price" style="color:#639922">~$95–100/share post-split · ~$1.25T combined valuation</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot-wrap"><div class="tl-dot" style="background:var(--green);border-color:var(--green)"></div><div class="tl-line"></div></div>
+      <div class="tl-content">
+        <div class="tl-date">May 20, 2026</div>
+        <div class="tl-title">S-1 filed — Nasdaq Private Market: $119.81/share</div>
+        <div class="tl-desc">SpaceX files S-1 registration statement. Nasdaq Private Market estimates share price at $119.81. Forge Price at ~$128.88 on June 3.</div>
+        <div class="tl-price" style="color:var(--green)">$119.81–128.88/share · ~$1.5–1.6T implied valuation</div>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-dot-wrap"><div class="tl-dot" style="background:var(--green);border-color:var(--green)"></div></div>
+      <div class="tl-content">
+        <div class="tl-date">June 3–4, 2026 — Today (roadshow launch)</div>
+        <div class="tl-title">IPO priced at $135/share — $1.77T valuation</div>
+        <div class="tl-desc">SpaceX files amended S-1 with fixed price of $135/share, selling 555.6 million Class A shares to raise $75B. IPO debut targeted for June 12, 2026. This is the first price at which your shares can be publicly sold — subject to lock-up restrictions.</div>
+        <div class="tl-price" style="color:var(--green); font-size:14px; font-weight:600">$135/share · $1.77T valuation — IPO price</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-hd">Return calculator — adjust your entry assumptions</div>
+  <div class="ctrl-row">
+    <label>Entry price per share (post-split) <span id="entryLbl">$27.50</span></label>
+    <input type="range" id="entryPrice" min="20" max="55" step="0.5" value="27.5" oninput="recalc()">
+  </div>
+  <div class="ctrl-row">
+    <label>Investment amount (USD) <span id="invLbl">$1,000,000</span></label>
+    <input type="range" id="invAmt" min="100000" max="5000000" step="50000" value="1000000" oninput="recalc()">
+  </div>
+  <div class="ctrl-row">
+    <label>Exit / current price <span id="exitLbl">$135.00 (IPO)</span></label>
+    <input type="range" id="exitPrice" min="80" max="300" step="1" value="135" oninput="recalc()">
+  </div>
+
+  <div class="cards4" id="summCards"></div>
+
+  <div class="sec-hd">Value over time ($M)</div>
+  <div class="chart-wrap"><canvas id="valChart" role="img" aria-label="Line chart showing value of $1M SpaceX investment from November 2025 to June 2026 IPO"></canvas></div>
+
+  <div class="sec-hd">Detailed return breakdown</div>
+  <table class="breakdown" id="breakTable"></table>
+
+  <div class="sec-hd">Important considerations</div>
+  <div class="risk-row">
+    <div class="risk-card bull">
+      <div class="rh">Upside factors</div>
+      IPO debut on June 12 could trade significantly above the $135 offering price if demand is strong. Passive index inclusion (Nasdaq-100 eligible after 15 trading days) could create additional buying. Lock-up expiry in ~12 months unlocks full liquidity. IPO greenshoe of 83.3M shares at $135 adds price support.
+    </div>
+    <div class="risk-card bear">
+      <div class="rh">Key risks</div>
+      Secondary market shares are illiquid and subject to transfer restrictions — you may not be able to sell until post-IPO lock-up expiry (~June 2027). Morningstar fair value estimate of ~$780B implies 56% downside from IPO price. GAAP net losses of $4.9B (2025), $4.3B (Q1 2026) may weigh on sentiment post-listing. Musk 82%+ voting control limits governance recourse.
+    </div>
+  </div>
+
+  <div class="note" id="noteBox"></div>
+</section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+let chartInst = null;
+
+const TIMELINE = [
+  { label: 'Jul 2025', price: 42.40, valB: 400 },
+  { label: 'Nov 2025\n(your entry)', price: 27.50, valB: 510 },
+  { label: 'Dec 2025', price: 84.20, valB: 800 },
+  { label: 'Feb 2026', price: 97.00, valB: 1250 },
+  { label: 'May 2026\n(S-1)', price: 119.81, valB: 1550 },
+  { label: 'Jun 4, 2026\n(today)', price: 135, valB: 1770 }
+];
+
+function fmt(v) { return '$' + Math.round(v).toLocaleString(); }
+function fmtPct(v) { return (v >= 0 ? '+' : '') + v.toFixed(1) + '%'; }
+function fmtX(v) { return v.toFixed(2) + 'x'; }
+
+function recalc() {
+  const entry = parseFloat(document.getElementById('entryPrice').value);
+  const inv = parseFloat(document.getElementById('invAmt').value);
+  const exitP = parseFloat(document.getElementById('exitPrice').value);
+
+  document.getElementById('entryLbl').textContent = '$' + entry.toFixed(2);
+  document.getElementById('invLbl').textContent = '$' + inv.toLocaleString();
+  document.getElementById('exitLbl').textContent = '$' + exitP.toFixed(2) + (exitP === 135 ? ' (IPO)' : '');
+
+  const shares = inv / entry;
+  const currentVal = shares * exitP;
+  const gain = currentVal - inv;
+  const pct = (gain / inv) * 100;
+  const multiple = currentVal / inv;
+
+  document.getElementById('heroVal').textContent = fmt(currentVal);
+  document.getElementById('heroSub').textContent = `At $${exitP.toFixed(2)}/share  ·  Gain: ${fmt(gain)}  ·  Return: ${fmtPct(pct)}`;
+  document.getElementById('heroBadge').textContent = fmtPct(pct) + ' in ~7 months';
+  document.getElementById('heroBadge').className = 'badge ' + (pct >= 0 ? 'green' : '');
+
+  document.getElementById('summCards').innerHTML = `
+    <div class="mc"><div class="lbl">Shares purchased</div><div class="v">${Math.round(shares).toLocaleString()}</div><div class="s">Class A (post-split)</div></div>
+    <div class="mc"><div class="lbl">Cost basis</div><div class="v">$${entry.toFixed(2)}</div><div class="s">Per share (Nov 2025)</div></div>
+    <div class="mc"><div class="lbl">Current price</div><div class="v">$${exitP.toFixed(2)}</div><div class="s">IPO price Jun 2026</div></div>
+    <div class="mc"><div class="lbl">Total return</div><div class="v" style="color:${pct>=0?'#2ecc71':'#e74c3c'}">${fmtPct(pct)}</div><div class="s">${fmtX(multiple)} money multiple</div></div>
+    <div class="mc"><div class="lbl">Unrealised gain</div><div class="v" style="color:${gain>=0?'#2ecc71':'#e74c3c'}">${fmt(gain)}</div><div class="s">Before tax</div></div>
+    <div class="mc"><div class="lbl">Portfolio value</div><div class="v" style="color:${currentVal>=0?'#2ecc71':'#e74c3c'}">${fmt(currentVal)}</div><div class="s">Mark-to-IPO-price</div></div>
+  `;
+
+  renderChart(entry, inv, exitP);
+  renderTable(entry, inv, exitP, shares);
+  renderNote(entry, inv, exitP, shares, pct);
+}
+
+function renderChart(entry, inv, exitP) {
+  const ctx = document.getElementById('valChart').getContext('2d');
+  if (chartInst) chartInst.destroy();
+
+  const prices = TIMELINE.map(t => t.price === 27.50 ? entry : t.price);
+  prices[5] = exitP;
+  const vals = prices.map(p => Math.round(inv * p / entry / 1000) / 1000);
+  const labels = TIMELINE.map(t => t.label);
+
+  chartInst = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Portfolio value ($M)',
+        data: vals,
+        borderColor: '#2ecc71',
+        backgroundColor: 'rgba(46,204,113,0.08)',
+        borderWidth: 2,
+        pointRadius: [4,6,4,4,4,6],
+        pointBackgroundColor: ['#6b6560','#c9a84c','#639922','#2ecc71','#2ecc71','#2ecc71'],
+        tension: 0.3,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0a0a0a',
+          titleColor: '#f5f2ec',
+          bodyColor: '#f5f2ec',
+          borderColor: 'rgba(201,168,76,0.3)',
+          borderWidth: 1,
+          callbacks: { label: ctx => '$' + ctx.parsed.y.toFixed(2) + 'M' }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#6b6560', font: { size: 10 } } },
+        y: { grid: { color: 'rgba(201,168,76,0.06)' }, ticks: { color: '#6b6560', font: { size: 10 }, callback: v => '$' + v.toFixed(1) + 'M' } }
+      }
+    }
+  });
+}
+
+function renderTable(entry, inv, exitP, shares) {
+  const rows = [
+    { event: 'Nov 2025 — investment date', price: entry, val: inv, gain: 0, pct: 0 },
+    { event: 'Dec 2025 — $800B tender offer', price: 84.20, val: shares * 84.20, gain: shares * 84.20 - inv, pct: (shares * 84.20 - inv) / inv * 100 },
+    { event: 'Feb 2026 — xAI merger ($1.25T)', price: 97.00, val: shares * 97.00, gain: shares * 97.00 - inv, pct: (shares * 97.00 - inv) / inv * 100 },
+    { event: 'May 2026 — S-1 filed (NPM: $119.81)', price: 119.81, val: shares * 119.81, gain: shares * 119.81 - inv, pct: (shares * 119.81 - inv) / inv * 100 },
+    { event: 'Jun 3, 2026 — IPO priced at $135', price: exitP, val: shares * exitP, gain: shares * exitP - inv, pct: (shares * exitP - inv) / inv * 100 },
+  ];
+
+  const html = `<thead><tr><th>Milestone</th><th>Share price</th><th>Portfolio value</th><th>Unrealised gain</th><th>Return</th></tr></thead><tbody>` +
+    rows.map((r, i) => `<tr class="${i === rows.length - 1 ? 'total' : ''}">
+      <td>${r.event}</td>
+      <td>$${r.price.toFixed(2)}</td>
+      <td>${fmt(r.val)}</td>
+      <td class="${r.gain >= 0 ? 'pos' : 'neg'}">${r.gain === 0 ? '—' : fmt(r.gain)}</td>
+      <td class="${r.pct >= 0 ? 'pos' : 'neg'}">${r.pct === 0 ? '—' : fmtPct(r.pct)}</td>
+    </tr>`).join('') + '</tbody>';
+  document.getElementById('breakTable').innerHTML = html;
+}
+
+function renderNote(entry, inv, exitP, shares, pct) {
+  document.getElementById('noteBox').innerHTML =
+    `<strong>Methodology:</strong> Entry price of $${entry.toFixed(2)}/share is the post-5-for-1-stock-split equivalent of the November 2025 Forge Global secondary market quote of ~$224/share pre-split (split effective May 4, 2026). Your $${inv.toLocaleString()} purchased approximately ${Math.round(shares).toLocaleString()} Class A shares on a pre-split basis. All prices shown are post-split adjusted. IPO price of $135/share is the fixed offering price per SpaceX's amended S-1 filed June 3, 2026. <strong>Lock-up:</strong> Elon Musk has pledged a 366-day lock-up; existing secondary holders are typically subject to 180-day lock-ups post-IPO (confirm with your broker/platform). The gain shown is mark-to-IPO-price — not yet realised cash until lock-up expires. <strong>Tax note:</strong> Gains will likely be taxed as long-term capital gains (held >1 year by mid-2026 if purchased early Nov 2025). Consult your tax adviser.`;
+}
+
+recalc();
+</script>
+</body>
+</html>
