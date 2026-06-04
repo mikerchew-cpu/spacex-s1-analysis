@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceX (SPCX) — DCF Valuation Model</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=IBM+Plex+Mono:wght@300;400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --black: #0a0a0a;
+  --off-white: #f5f2ec;
+  --gold: #c9a84c;
+  --gold-light: #e8cd87;
+  --red: #c0392b;
+  --green: #1a6b40;
+  --green-l: rgba(26,107,64,0.2);
+  --mid: #6b6560;
+  --rule: rgba(201,168,76,0.3);
+  --bg-card: rgba(245,242,236,0.03);
+  --border-card: rgba(245,242,236,0.09);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--black);
+  color: var(--off-white);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.container { max-width: 1220px; margin: 0 auto; padding: 0 60px; }
+@media(max-width:768px){ .container { padding: 0 20px; } }
+
+/* HEADER */
+.header {
+  padding: 60px 0 40px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 40px;
+  background: radial-gradient(ellipse 80% 60% at 70% 40%, rgba(201,168,76,0.06) 0%, transparent 70%), var(--black);
+}
+.section-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.35em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 900;
+  line-height: 1.05;
+  margin-bottom: 12px;
+}
+h1 em { font-style: italic; color: var(--gold); }
+.gold-line { width: 60px; height: 3px; background: var(--gold); margin-top: 16px; }
+h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  color: var(--off-white);
+}
+
+/* SECTIONS */
+section { padding: 40px 0; border-bottom: 1px solid rgba(245,242,236,0.07); }
+section:last-child { border-bottom: none; }
+.section-sub {
+  font-size: 12px;
+  color: var(--mid);
+  font-family: 'IBM Plex Mono', monospace;
+  margin-bottom: 20px;
+}
+
+/* TWO COLUMN */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+@media(max-width:900px){ .two-col { grid-template-columns: 1fr; } }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+@media(max-width:768px){ .three-col { grid-template-columns: 1fr; } }
+
+/* INPUT PANEL */
+.inputs-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  padding: 24px;
+  border-radius: 4px;
+}
+.input-group { margin-bottom: 16px; }
+.input-group:last-child { margin-bottom: 0; }
+.input-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.input-label .label-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--mid);
+}
+.input-label .label-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.input-label .label-val.muted { color: var(--mid); font-size: 14px; font-family: 'IBM Plex Sans', sans-serif; font-weight: 400; }
+input[type="range"] {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(245,242,236,0.1);
+  border-radius: 2px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+  border: none;
+}
+input[type="range"]::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+  border: none;
+}
+.number-input {
+  background: rgba(245,242,236,0.05);
+  border: 1px solid var(--border-card);
+  color: var(--gold-light);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 3px;
+  width: 100%;
+  outline: none;
+}
+.number-input:focus { border-color: var(--gold); }
+
+/* COMPUTED VALUES */
+.computed-box {
+  background: linear-gradient(135deg, rgba(201,168,76,0.1) 0%, rgba(201,168,76,0.03) 100%);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+.computed-box:last-child { margin-bottom: 0; }
+.computed-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mid);
+}
+.computed-val {
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--gold);
+  line-height: 1.2;
+}
+.computed-val.small { font-size: 28px; }
+.computed-note {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--mid);
+  margin-top: 4px;
+}
+
+/* SCENARIO */
+.scenario-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.scenario-btn {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 10px 20px;
+  border: 1px solid var(--border-card);
+  background: var(--bg-card);
+  color: var(--mid);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.2s;
+}
+.scenario-btn:hover { border-color: var(--gold); color: var(--off-white); }
+.scenario-btn.active {
+  background: rgba(201,168,76,0.15);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.scenario-btn.custom { border-color: rgba(155,89,182,0.4); color: var(--mid); }
+.scenario-btn.custom.active { background: rgba(155,89,182,0.15); border-color: #9b59b6; color: #9b59b6; }
+
+/* CUSTOM OVERRIDES */
+.custom-grid {
+  display: none;
+  margin-top: 16px;
+  padding: 20px;
+  background: rgba(155,89,182,0.04);
+  border: 1px solid rgba(155,89,182,0.2);
+  border-radius: 4px;
+}
+.custom-grid.visible { display: block; }
+.custom-grid h4 {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #9b59b6;
+  margin-bottom: 14px;
+}
+.custom-grid .cg-row {
+  display: grid;
+  grid-template-columns: 140px repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+@media(max-width:900px){ .custom-grid .cg-row { grid-template-columns: 100px repeat(5, 1fr); } }
+@media(max-width:600px){ .custom-grid .cg-row { grid-template-columns: 80px repeat(5, 1fr); font-size: 12px; } }
+.cg-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--mid);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.cg-cell { text-align: center; }
+.cg-cell input[type="range"] { width: 100%; }
+.cg-cell .cg-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--off-white);
+  margin-top: 2px;
+}
+
+/* TABLES */
+.table-wrap { overflow-x: auto; margin-bottom: 24px; }
+.fin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  min-width: 600px;
+}
+.fin-table th {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border-bottom: 1px solid var(--rule);
+  padding: 8px 10px;
+  text-align: right;
+}
+.fin-table th:first-child { text-align: left; }
+.fin-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(245,242,236,0.05);
+  text-align: right;
+  color: rgba(245,242,236,0.85);
+}
+.fin-table td:first-child { text-align: left; color: var(--off-white); font-size: 11px; }
+.fin-table tr:hover td { background: rgba(201,168,76,0.04); }
+.fin-table .sub td { border-top: 1px solid var(--rule); font-weight: 500; color: var(--off-white); }
+.fin-table .total td { border-top: 2px solid var(--gold); font-weight: 600; color: var(--gold-light); }
+.fin-table .highlight td { background: rgba(201,168,76,0.06); }
+.pos-c { color: var(--green) !important; }
+.neg-c { color: var(--red) !important; }
+
+/* VALUATION SUMMARY */
+.val-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.val-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-top: 3px solid var(--gold);
+  padding: 20px;
+  border-radius: 3px;
+  text-align: center;
+}
+.val-card.primary { border-top-color: var(--gold); }
+.val-card.secondary { border-top-color: var(--mid); }
+.val-card .vlabel {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mid);
+  margin-bottom: 4px;
+}
+.val-card .vval {
+  font-family: 'Playfair Display', serif;
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--gold);
+  line-height: 1.2;
+}
+.val-card .vval.green { color: #2ecc71; }
+.val-card .vval.red { color: var(--red); }
+.val-card .vsub {
+  font-size: 11px;
+  color: var(--mid);
+  margin-top: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+/* VALUATION BREAKDOWN */
+.val-breakdown {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  padding: 24px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+.val-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(245,242,236,0.05);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
+.val-line:last-child { border-bottom: none; }
+.val-line .key { color: var(--mid); }
+.val-line .val { color: var(--off-white); font-weight: 500; }
+.val-line.total { border-top: 2px solid var(--gold); margin-top: 6px; padding-top: 10px; }
+.val-line.total .key { color: var(--gold); font-weight: 600; }
+.val-line.total .val { color: var(--gold-light); font-weight: 700; font-size: 15px; }
+.ipo-compare {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 16px;
+}
+.ipo-badge {
+  padding: 8px 16px;
+  border-radius: 3px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+}
+.ipo-badge.premium { background: var(--green-l); border: 1px solid rgba(26,107,64,0.3); color: #2ecc71; }
+.ipo-badge.discount { background: rgba(192,57,43,0.1); border: 1px solid rgba(192,57,43,0.3); color: var(--red); }
+
+/* SENSITIVITY TABLE */
+.sens-table-wrap { overflow-x: auto; }
+.sens-table {
+  border-collapse: collapse;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  width: 100%;
+  min-width: 400px;
+}
+.sens-table th, .sens-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border: 1px solid rgba(245,242,236,0.1);
+}
+.sens-table th {
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  background: var(--bg-card);
+}
+.sens-table td { color: var(--off-white); font-weight: 500; }
+.sens-table .row-header {
+  text-align: left;
+  color: var(--mid);
+  font-weight: 400;
+  font-size: 11px;
+}
+.sens-table .highlight-cell {
+  background: rgba(201,168,76,0.25) !important;
+  border: 2px solid var(--gold) !important;
+  font-weight: 700;
+  color: var(--gold-light) !important;
+}
+
+/* CHARTS */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 20px;
+}
+@media(max-width:1000px){ .charts-grid { grid-template-columns: 1fr; } }
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  padding: 20px;
+  border-radius: 4px;
+}
+.chart-card.full { grid-column: 1 / -1; }
+.chart-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+}
+.chart-wrap { position: relative; height: 280px; }
+.chart-wrap.tall { height: 340px; }
+
+/* FOOTER */
+.footer {
+  padding: 30px 0;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--mid);
+  letter-spacing: 0.1em;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .fin-table { font-size: 10px; }
+  .fin-table th, .fin-table td { padding: 6px 6px; }
+  .val-card .vval { font-size: 22px; }
+  .computed-val { font-size: 28px; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="section-label">VALUATION METHODOLOGY</div>
+  <h1>Space<em>X</em> (SPCX) — DCF Valuation Model</h1>
+  <p style="color:rgba(245,242,236,0.6); max-width:700px; margin-bottom:12px;">Discounted Cash Flow analysis incorporating 5-year projected financials, terminal value, and sensitivity analysis. All inputs are adjustable in real time.</p>
+  <div class="gold-line"></div>
+</div>
+
+<!-- KEY INPUTS -->
+<section>
+  <div class="section-label">Key Assumptions</div>
+  <h2>WACC &amp; Capital Structure Inputs</h2>
+  <div class="two-col">
+    <div class="inputs-panel">
+      <div class="input-group">
+        <div class="input-label">
+          <span class="label-text">Risk-Free Rate</span>
+          <span class="label-val" id="rf-display">4.46%</span>
+        </div>
+        <input type="range" id="rf-slider" min="2" max="8" step="0.01" value="4.46">
+      </div>
+      <div class="input-group">
+        <div class="input-label">
+          <span class="label-text">Equity Risk Premium</span>
+          <span class="label-val" id="erp-display">5.50%</span>
+        </div>
+        <input type="range" id="erp-slider" min="3" max="8" step="0.01" value="5.5">
+      </div>
+      <div class="input-group">
+        <div class="input-label">
+          <span class="label-text">Beta</span>
+          <span class="label-val" id="beta-display">1.40</span>
+        </div>
+        <input type="range" id="beta-slider" min="0.8" max="2.5" step="0.01" value="1.4">
+      </div>
+      <div class="input-group">
+        <div class="input-label">
+          <span class="label-text">Pre-Tax Cost of Debt</span>
+          <span class="label-val" id="ptkd-display">6.50%</span>
+        </div>
+        <input type="range" id="ptkd-slider" min="3" max="12" step="0.01" value="6.5">
+      </div>
+      <div class="input-group">
+        <div class="input-label">
+          <span class="label-text">Debt Weight</span>
+          <span class="label-val" id="dw-display">30.0%</span>
+        </div>
+        <input type="range" id="dw-slider" min="0" max="60" step="0.1" value="30">
+      </div>
+      <div class="input-group">
+        <div class="input-label">
+          <span class="label-text">Tax Rate (Projection)</span>
+          <span class="label-val" id="trp-display">0.0%</span>
+        </div>
+        <input type="range" id="trp-slider" min="0" max="25" step="0.1" value="0">
+      </div>
+      <div class="input-group">
+        <div class="input-label">
+          <span class="label-text">Tax Rate (Terminal)</span>
+          <span class="label-val" id="trt-display">21.0%</span>
+        </div>
+        <input type="range" id="trt-slider" min="0" max="25" step="0.1" value="21">
+      </div>
+      <div class="input-group">
+        <div class="input-label">
+          <span class="label-text">Terminal Growth Rate</span>
+          <span class="label-val" id="tg-display">3.00%</span>
+        </div>
+        <input type="range" id="tg-slider" min="0" max="5" step="0.05" value="3">
+      </div>
+      <div class="input-group">
+        <div class="input-label">
+          <span class="label-text">Net Debt ($M)</span>
+          <span class="label-val muted" id="nd-display">$5,460</span>
+        </div>
+        <input type="number" class="number-input" id="net-debt" value="5460" step="10">
+      </div>
+      <div class="input-group">
+        <div class="input-label">
+          <span class="label-text">Shares Outstanding (M)</span>
+          <span class="label-val muted" id="so-display">13,076</span>
+        </div>
+        <input type="number" class="number-input" id="shares-out" value="13076" step="1">
+      </div>
+    </div>
+    <div>
+      <div class="computed-box">
+        <div class="computed-label">Weighted Average Cost of Capital (WACC)</div>
+        <div class="computed-val" id="wacc-display">—</div>
+        <div class="computed-note">Used for discounting projected FCFs</div>
+      </div>
+      <div class="computed-box">
+        <div class="computed-label">Terminal WACC</div>
+        <div class="computed-val small" id="twacc-display">—</div>
+        <div class="computed-note">Used for terminal value calculation (terminal tax rate)</div>
+      </div>
+      <div class="computed-box">
+        <div class="computed-label">Cost of Equity (Ke)</div>
+        <div class="computed-val small" id="coe-display">—</div>
+        <div class="computed-note">R<sub>f</sub> + β × ERP</div>
+      </div>
+      <div class="computed-box">
+        <div class="computed-label">After-Tax Cost of Debt (Kd)</div>
+        <div class="computed-val small" id="atkd-display">—</div>
+        <div class="computed-note">Pre-tax Kd × (1 − tax rate)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCENARIOS -->
+<section>
+  <div class="section-label">Scenario Selector</div>
+  <h2>Projection Assumptions</h2>
+  <p class="section-sub">Choose a preset scenario or select "Custom" to adjust individual year assumptions.</p>
+  <div class="scenario-bar">
+    <button class="scenario-btn active" data-scenario="base">Base Case</button>
+    <button class="scenario-btn" data-scenario="bull">Bull Case</button>
+    <button class="scenario-btn" data-scenario="bear">Bear Case</button>
+    <button class="scenario-btn custom" data-scenario="custom">Custom</button>
+  </div>
+  <div class="two-col" style="margin-top:16px;">
+    <div>
+      <h3 style="font-size:14px; font-family:'IBM Plex Mono',monospace; letter-spacing:0.1em; text-transform:uppercase; color:var(--mid);">Revenue Growth by Year</h3>
+      <div id="growth-preview" style="display:flex; gap:8px; margin-top:8px;"></div>
+    </div>
+    <div>
+      <h3 style="font-size:14px; font-family:'IBM Plex Mono',monospace; letter-spacing:0.1em; text-transform:uppercase; color:var(--mid);">EBITDA Margin by Year</h3>
+      <div id="margin-preview" style="display:flex; gap:8px; margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <!-- Custom overrides -->
+  <div class="custom-grid" id="custom-grid">
+    <h4>Custom Year-by-Year Overrides</h4>
+    <div class="cg-row" style="border-bottom:1px solid rgba(155,89,182,0.2); padding-bottom:6px; margin-bottom:6px;">
+      <div class="cg-label">Year</div>
+      <div class="cg-cell" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mid);">2026E</div>
+      <div class="cg-cell" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mid);">2027E</div>
+      <div class="cg-cell" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mid);">2028E</div>
+      <div class="cg-cell" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mid);">2029E</div>
+      <div class="cg-cell" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--mid);">2030E</div>
+    </div>
+    <div class="cg-row">
+      <div class="cg-label">Growth %</div>
+      <div class="cg-cell"><input type="range" id="cg-g0" min="0" max="60" step="0.5"><div class="cg-val" id="cg-g0-v">35.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-g1" min="0" max="60" step="0.5"><div class="cg-val" id="cg-g1-v">28.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-g2" min="0" max="60" step="0.5"><div class="cg-val" id="cg-g2-v">22.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-g3" min="0" max="60" step="0.5"><div class="cg-val" id="cg-g3-v">16.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-g4" min="0" max="60" step="0.5"><div class="cg-val" id="cg-g4-v">12.0%</div></div>
+    </div>
+    <div class="cg-row">
+      <div class="cg-label">EBITDA %</div>
+      <div class="cg-cell"><input type="range" id="cg-m0" min="15" max="65" step="0.5"><div class="cg-val" id="cg-m0-v">37.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-m1" min="15" max="65" step="0.5"><div class="cg-val" id="cg-m1-v">40.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-m2" min="15" max="65" step="0.5"><div class="cg-val" id="cg-m2-v">43.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-m3" min="15" max="65" step="0.5"><div class="cg-val" id="cg-m3-v">46.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-m4" min="15" max="65" step="0.5"><div class="cg-val" id="cg-m4-v">48.0%</div></div>
+    </div>
+    <div class="cg-row">
+      <div class="cg-label">Capex/Rev %</div>
+      <div class="cg-cell"><input type="range" id="cg-c0" min="5" max="60" step="0.5"><div class="cg-val" id="cg-c0-v">45.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-c1" min="5" max="60" step="0.5"><div class="cg-val" id="cg-c1-v">35.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-c2" min="5" max="60" step="0.5"><div class="cg-val" id="cg-c2-v">28.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-c3" min="5" max="60" step="0.5"><div class="cg-val" id="cg-c3-v">22.0%</div></div>
+      <div class="cg-cell"><input type="range" id="cg-c4" min="5" max="60" step="0.5"><div class="cg-val" id="cg-c4-v">18.0%</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- REVENUE PROJECTIONS -->
+<section>
+  <div class="section-label">Financial Projections</div>
+  <h2>Revenue Build-Up</h2>
+  <p class="section-sub">Base year 2025A actual revenue of $18,674M. Projected years compound at selected growth rates.</p>
+  <div class="table-wrap">
+    <table class="fin-table" id="rev-table">
+      <thead>
+        <tr><th>$ millions</th><th>2025A</th><th>2026E</th><th>2027E</th><th>2028E</th><th>2029E</th><th>2030E</th></tr>
+      </thead>
+      <tbody id="rev-tbody"></tbody>
+    </table>
+  </div>
+  <div class="chart-card">
+    <div class="chart-title">Revenue &amp; EBITDA Projection</div>
+    <div class="chart-wrap tall"><canvas id="revenueChart"></canvas></div>
+  </div>
+</section>
+
+<!-- EBITDA & FCF -->
+<section>
+  <div class="section-label">Cash Flow Build</div>
+  <h2>EBITDA &amp; Free Cash Flow</h2>
+  <p class="section-sub">D&A declining from 49% of revenue (2025A) to 35% (2030E). CapEx per scenario. NWC change at 2% of revenue change.</p>
+  <div class="table-wrap">
+    <table class="fin-table" id="fcf-table">
+      <thead>
+        <tr><th>$ millions</th><th>2025A</th><th>2026E</th><th>2027E</th><th>2028E</th><th>2029E</th><th>2030E</th></tr>
+      </thead>
+      <tbody id="fcf-tbody"></tbody>
+    </table>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Free Cash Flow by Year</div>
+      <div class="chart-wrap"><canvas id="fcfChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">FCF Waterfall — Components</div>
+      <div class="chart-wrap"><canvas id="waterfallChart"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUATION SUMMARY -->
+<section>
+  <div class="section-label">Valuation Output</div>
+  <h2>Valuation Summary</h2>
+  <div class="val-summary" id="val-summary"></div>
+  <div class="two-col">
+    <div class="val-breakdown" id="val-breakdown"></div>
+    <div class="chart-card">
+      <div class="chart-title">Valuation Bridge</div>
+      <div class="chart-wrap"><canvas id="bridgeChart"></canvas></div>
+    </div>
+  </div>
+  <div id="ipo-comparison" style="text-align:center; margin-top:16px;"></div>
+</section>
+
+<!-- SENSITIVITY -->
+<section>
+  <div class="section-label">Sensitivity Analysis</div>
+  <h2>Implied Share Price — WACC × Terminal Growth</h2>
+  <p class="section-sub">5×5 grid showing implied equity value per share across a range of WACC and terminal growth assumptions. Gold-highlighted cell = base case.</p>
+  <div class="sens-table-wrap">
+    <table class="sens-table" id="sens-table">
+      <thead>
+        <tr><th>WACC \ Terminal Growth</th><th>1.50%</th><th>2.25%</th><th>3.00%</th><th>3.75%</th><th>4.50%</th></tr>
+      </thead>
+      <tbody id="sens-tbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ALL CHARTS IN ROW -->
+<section>
+  <div class="section-label">Visual Appendix</div>
+  <h2>DCF Visualizations</h2>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Revenue (Bars) &amp; EBITDA Margin (Line)</div>
+      <div class="chart-wrap"><canvas id="chartRevMargin"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">FCF per Year</div>
+      <div class="chart-wrap"><canvas id="chartFCF"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Valuation Bridge ($B)</div>
+      <div class="chart-wrap"><canvas id="chartBridge"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Sensitivity — Implied Share Price</div>
+      <div class="chart-wrap"><canvas id="chartSens"></canvas></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="footer">
+  <span>SPACEX (SPCX) DCF VALUATION MODEL — JUNE 2026</span>
+  <span style="margin:0 12px">|</span>
+  <span>FOR INSTITUTIONAL USE ONLY</span>
+  <span style="margin:0 12px">|</span>
+  <span>ALL INPUTS ADJUSTABLE IN REAL TIME</span>
+</div>
+
+<script>
+// ===== STATE =====
+const SCENARIOS = {
+  base: {
+    label: 'Base Case',
+    growth: [35, 28, 22, 16, 12],
+    ebitdaMargin: [37, 40, 43, 46, 48],
+    capexPct: [45, 35, 28, 22, 18]
+  },
+  bull: {
+    label: 'Bull Case',
+    growth: [45, 38, 32, 25, 20],
+    ebitdaMargin: [40, 45, 50, 53, 55],
+    capexPct: [40, 32, 25, 20, 16]
+  },
+  bear: {
+    label: 'Bear Case',
+    growth: [25, 18, 12, 8, 5],
+    ebitdaMargin: [35, 36, 37, 38, 38],
+    capexPct: [50, 42, 35, 28, 22]
+  }
+};
+
+const state = {
+  rf: 4.46, erp: 5.5, beta: 1.40, ptKd: 6.5,
+  debtW: 30, taxProj: 0, taxTerm: 21, termG: 3.0,
+  netDebt: 5460, shares: 13076,
+  scenario: 'base',
+  customGrowth: [35, 28, 22, 16, 12],
+  customMargin: [37, 40, 43, 46, 48],
+  customCapex: [45, 35, 28, 22, 18]
+};
+
+const REV_2025 = 18674;
+const EBITDA_MARGIN_2025 = 35.3;
+const DA_PCT = [49, 46.2, 43.4, 40.6, 37.8, 35]; // 2025A through 2030E
+const YEARS = ['2025A', '2026E', '2027E', '2028E', '2029E', '2030E'];
+
+// ===== HELPERS =====
+function fmtPct(v) { return v.toFixed(2) + '%'; }
+function fmtPct1(v) { return v.toFixed(1) + '%'; }
+function fmtM(v) {
+  if (Math.abs(v) >= 1000) {
+    const b = v / 1000;
+    return (v < 0 ? '-$' : '$') + Math.abs(b).toFixed(2) + 'B';
+  }
+  return (v < 0 ? '-$' : '$') + Math.abs(v).toFixed(1) + 'M';
+}
+function fmtNum(v) {
+  if (Math.abs(v) >= 1000) {
+    return (v / 1000).toFixed(2) + 'B';
+  }
+  return v.toFixed(1) + 'M';
+}
+function fmtPrice(v) { return '$' + v.toFixed(2); }
+
+// ===== GET CURRENT PROJECTION VALUES =====
+function getProjection() {
+  let growth, ebitdaMargin, capexPct;
+  if (state.scenario === 'custom') {
+    growth = state.customGrowth;
+    ebitdaMargin = state.customMargin;
+    capexPct = state.customCapex;
+  } else {
+    const s = SCENARIOS[state.scenario];
+    growth = s.growth;
+    ebitdaMargin = s.ebitdaMargin;
+    capexPct = s.capexPct;
+  }
+  return { growth, ebitdaMargin, capexPct };
+}
+
+// ===== COMPUTE WACC =====
+function getWACC(taxRate) {
+  const ke = state.rf + state.beta * state.erp;
+  const atKd = state.ptKd * (1 - taxRate / 100);
+  const wacc = ke * (1 - state.debtW / 100) + atKd * (state.debtW / 100);
+  return { ke, atKd, wacc };
+}
+
+// ===== FULL DCF COMPUTATION =====
+function computeDCF(waccOverride, tgOverride) {
+  const p = getProjection();
+  const { growth, ebitdaMargin, capexPct } = p;
+
+  const useWacc = waccOverride != null ? waccOverride : getWACC(state.taxProj).wacc;
+  const useTg = tgOverride != null ? tgOverride : state.termG;
+  const termWacc = waccOverride != null ? waccOverride : getWACC(state.taxTerm).wacc;
+
+  const revenues = [REV_2025];
+  for (let i = 0; i < 5; i++) {
+    revenues.push(revenues[i] * (1 + growth[i] / 100));
+  }
+
+  const ebitda = [];
+  for (let i = 0; i < 6; i++) {
+    const margin = i === 0 ? EBITDA_MARGIN_2025 : ebitdaMargin[i - 1];
+    ebitda.push(revenues[i] * margin / 100);
+  }
+
+  const da = revenues.map((r, i) => r * DA_PCT[i] / 100);
+  const ebit = ebitda.map((e, i) => e - da[i]);
+  const taxRate = waccOverride != null ? state.taxProj : state.taxProj;
+  const nopat = ebit.map(e => e * (1 - taxRate / 100));
+
+  const capex = revenues.map((r, i) => {
+    if (i === 0) return r * capexPct[0] / 100;
+    return r * capexPct[i - 1] / 100;
+  });
+  // 2025A capex should use actual. We'll still use scenario value for consistency since actual was very high.
+  // Use first scenario value for 2025A display only
+
+  const nwc = [];
+  nwc.push(0);
+  for (let i = 1; i < 6; i++) {
+    nwc.push(0.02 * (revenues[i] - revenues[i - 1]));
+  }
+
+  const fcf = nopat.map((n, i) => n + da[i] - capex[i] - nwc[i]);
+
+  // PV of FCFs (projection years only: indices 1-5 = 2026E-2030E)
+  const pvFcf = [];
+  let sumPvFcf = 0;
+  for (let i = 1; i <= 5; i++) {
+    const df = 1 / Math.pow(1 + useWacc / 100, i);
+    const pv = fcf[i] * df;
+    pvFcf.push(pv);
+    sumPvFcf += pv;
+  }
+
+  // Terminal value
+  const terminalFcf = fcf[5] * (1 + useTg / 100);
+  const tv = terminalFcf / ((termWacc / 100) - (useTg / 100));
+  const pvTv = tv / Math.pow(1 + useWacc / 100, 5);
+
+  const ev = sumPvFcf + pvTv;
+  const equityVal = ev - state.netDebt;
+  const price = equityVal / state.shares; // equityVal in $M, shares in M -> price in $
+
+  return {
+    revenues, ebitda, da, ebit, nopat, capex, nwc, fcf,
+    pvFcf, sumPvFcf, tv, pvTv, ev, equityVal, price,
+    useWacc, useTg, termWacc
+  };
+}
+
+// ===== FORMAT NUMBERS =====
+function formatRow(header, vals, isPct, isTotal) {
+  let cls = isTotal ? 'total' : '';
+  let html = '<tr class="' + cls + '"><td>' + header + '</td>';
+  for (let i = 0; i < vals.length; i++) {
+    if (isPct) {
+      html += '<td>' + vals[i].toFixed(1) + '%</td>';
+    } else {
+      html += '<td class="' + (vals[i] < 0 ? 'neg-c' : '') + '">' + fmtM(vals[i]) + '</td>';
+    }
+  }
+  html += '</tr>';
+  return html;
+}
+
+function formatRowPct(header, vals) {
+  let html = '<tr><td>' + header + '</td>';
+  for (let i = 0; i < vals.length; i++) {
+    html += '<td>' + vals[i].toFixed(1) + '%</td>';
+  }
+  html += '</tr>';
+  return html;
+}
+
+// ===== UPDATE ALL =====
+function updateAll() {
+  const p = getProjection();
+  const w = getWACC(state.taxProj);
+  const wt = getWACC(state.taxTerm);
+  const dcf = computeDCF();
+
+  // Update computed displays
+  document.getElementById('wacc-display').textContent = dcf.useWacc.toFixed(2) + '%';
+  document.getElementById('twacc-display').textContent = dcf.termWacc.toFixed(2) + '%';
+  document.getElementById('coe-display').textContent = w.ke.toFixed(2) + '%';
+  document.getElementById('atkd-display').textContent = w.atKd.toFixed(2) + '%';
+
+  // Update scenario preview
+  document.getElementById('growth-preview').innerHTML = p.growth.map((g, i) =>
+    '<span style="background:rgba(201,168,76,0.1);padding:4px 10px;border-radius:2px;font-family:IBM Plex Mono,monospace;font-size:12px;">' +
+    YEARS[i+1] + ' <strong style="color:var(--gold)">' + g.toFixed(1) + '%</strong></span>'
+  ).join('');
+  document.getElementById('margin-preview').innerHTML = p.ebitdaMargin.map((m, i) =>
+    '<span style="background:rgba(46,204,113,0.1);padding:4px 10px;border-radius:2px;font-family:IBM Plex Mono,monospace;font-size:12px;">' +
+    YEARS[i+1] + ' <strong style="color:#2ecc71">' + m.toFixed(1) + '%</strong></span>'
+  ).join('');
+
+  // Revenue table
+  const growthRates = [0].concat(p.growth);
+  let revHtml = '<tr><td>Revenue ($M)</td>';
+  for (let i = 0; i < 6; i++) {
+    revHtml += '<td><strong>' + fmtM(dcf.revenues[i]).replace('$','') + '</strong></td>';
+  }
+  revHtml += '</tr>';
+  revHtml += '<tr><td>YoY Growth</td>';
+  revHtml += '<td>—</td>';
+  for (let i = 1; i < 6; i++) {
+    const g = (dcf.revenues[i] / dcf.revenues[i-1] - 1) * 100;
+    revHtml += '<td class="' + (g > 0 ? 'pos-c' : 'neg-c') + '">+' + g.toFixed(1) + '%</td>';
+  }
+  revHtml += '</tr>';
+  document.getElementById('rev-tbody').innerHTML = revHtml;
+
+  // FCF table
+  let fcfHtml = '';
+  fcfHtml += formatRow('Revenue', dcf.revenues);
+  fcfHtml += formatRowPct('EBITDA Margin', [EBITDA_MARGIN_2025].concat(p.ebitdaMargin));
+  fcfHtml += formatRow('EBITDA', dcf.ebitda);
+  fcfHtml += formatRow('(-) D&A', dcf.da);
+  fcfHtml += formatRow('= EBIT', dcf.ebit, false, true);
+  fcfHtml += formatRow('NOPAT', dcf.nopat);
+  fcfHtml += formatRow('(+) D&A add-back', dcf.da);
+  fcfHtml += formatRow('(-) CapEx', dcf.capex.map(c => -c));
+  fcfHtml += formatRow('(-) Δ NWC', dcf.nwc.map(n => -n));
+  fcfHtml += formatRow('<strong>Unlevered FCF</strong>', dcf.fcf, false, true);
+  document.getElementById('fcf-tbody').innerHTML = fcfHtml;
+
+  // Valuation summary cards
+  const ipoSymbol = dcf.price >= 135 ? '▲' : '▼';
+  const ipoColor = dcf.price >= 135 ? 'green' : 'red';
+  const ipoPct = ((dcf.price / 135) - 1) * 100;
+  const ipoLabel = dcf.price >= 135 ? 'Premium to IPO' : 'Discount to IPO';
+
+  document.getElementById('val-summary').innerHTML = [
+    '<div class="val-card primary"><div class="vlabel">Enterprise Value</div><div class="vval">' + fmtNum(dcf.ev) + '</div><div class="vsub">Sum of PV FCFs + PV Terminal Value</div></div>',
+    '<div class="val-card primary"><div class="vlabel">Equity Value</div><div class="vval">' + fmtNum(dcf.equityVal) + '</div><div class="vsub">EV − Net Debt</div></div>',
+    '<div class="val-card primary"><div class="vval ' + ipoColor + '">' + fmtPrice(dcf.price) + '</div><div class="vlabel">Implied Share Price</div><div class="vsub">Per Class A Share</div></div>',
+    '<div class="val-card secondary"><div class="vval ' + ipoColor + '">' + (ipoPct >= 0 ? '+' : '') + ipoPct.toFixed(1) + '%</div><div class="vlabel">' + ipoLabel + '</div><div class="vsub">IPO Price: $135.00</div></div>'
+  ].join('');
+
+  // Valuation breakdown
+  document.getElementById('val-breakdown').innerHTML = [
+    '<div style="font-family:IBM Plex Mono,monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">Valuation Bridge — Detailed Build</div>',
+    '<div class="val-line"><span class="key">Sum of PV of Projected FCFs (2026E−2030E)</span><span class="val">' + fmtM(dcf.sumPvFcf) + '</span></div>',
+    '<div class="val-line"><span class="key">PV of Terminal Value</span><span class="val">' + fmtM(dcf.pvTv) + '</span></div>',
+    '<div class="val-line total"><span class="key">Enterprise Value</span><span class="val">' + fmtM(dcf.ev) + '</span></div>',
+    '<div class="val-line"><span class="key">Less: Net Debt</span><span class="val neg-c" style="color:var(--red)">' + fmtM(-state.netDebt) + '</span></div>',
+    '<div class="val-line total"><span class="key">Equity Value</span><span class="val">' + fmtM(dcf.equityVal) + '</span></div>',
+    '<div class="val-line"><span class="key">÷ Shares Outstanding</span><span class="val">' + state.shares.toLocaleString() + 'M</span></div>',
+    '<div class="val-line total"><span class="key">Implied Share Price</span><span class="val">' + fmtPrice(dcf.price) + '</span></div>',
+    '<div class="val-line"><span class="key">Terminal FCF</span><span class="val">' + fmtM(dcf.fcf[5] * (1 + dcf.useTg / 100)) + '</span></div>',
+    '<div class="val-line"><span class="key">Terminal Value (undiscounted)</span><span class="val">' + fmtM(dcf.tv) + '</span></div>'
+  ].join('');
+
+  // IPO comparison
+  const ipoPctAbs = Math.abs(ipoPct);
+  document.getElementById('ipo-comparison').innerHTML =
+    '<div class="ipo-badge ' + (dcf.price >= 135 ? 'premium' : 'discount') + '">' +
+    'IPO Price: $135.00 &nbsp; ' + ipoSymbol + ' &nbsp; Implied: ' + fmtPrice(dcf.price) +
+    ' &nbsp; (' + (dcf.price >= 135 ? '+' : '') + ipoPct.toFixed(1) + '%)' +
+    '</div>';
+
+  // Sensitivity table
+  buildSensitivity();
+
+  // Charts
+  updateCharts(dcf);
+}
+
+// ===== SENSITIVITY TABLE =====
+function buildSensitivity() {
+  const tgs = [1.5, 2.25, 3.0, 3.75, 4.5];
+  const waccs = [8.5, 9.5, 10.5, 11.5, 12.5];
+  const baseWacc = Math.round(getWACC(state.taxProj).wacc * 10) / 10;
+  const baseTg = state.termG;
+
+  let html = '';
+  for (let wi = 0; wi < waccs.length; wi++) {
+    html += '<tr>';
+    html += '<td class="row-header">WACC ' + waccs[wi].toFixed(1) + '%</td>';
+    for (let ti = 0; ti < tgs.length; ti++) {
+      const dcf = computeDCF(waccs[wi], tgs[ti]);
+      const price = dcf.price;
+      const isBase = Math.abs(waccs[wi] - baseWacc) < 0.05 && Math.abs(tgs[ti] - baseTg) < 0.05;
+      // Color intensity based on value relative to range
+      let bg = '';
+      if (price > 0) {
+        const intensity = Math.min(Math.max(price / 300, 0), 1);
+        const r = Math.round(200 - intensity * 150);
+        const g = Math.round(60 + intensity * 100);
+        const b = Math.round(60 - intensity * 40);
+        bg = 'background:rgba(' + r + ',' + g + ',' + b + ',0.15)';
+      } else {
+        bg = 'background:rgba(192,57,43,0.15)';
+      }
+      html += '<td style="' + bg + '" class="' + (isBase ? 'highlight-cell' : '') + '">' +
+        (price > 0 ? fmtPrice(price) : '<span style="color:var(--red)">NM</span>') + '</td>';
+    }
+    html += '</tr>';
+  }
+  document.getElementById('sens-tbody').innerHTML = html;
+
+  // Update X-axis labels
+  var ths = document.querySelectorAll('#sens-table thead th');
+  if (ths.length > 1) {
+    for (let ti = 0; ti < tgs.length; ti++) {
+      ths[ti + 1].textContent = tgs[ti].toFixed(2) + '%';
+    }
+  }
+}
+
+// ===== CHARTS =====
+let chartInstances = {};
+
+function destroyChart(id) {
+  if (chartInstances[id]) {
+    chartInstances[id].destroy();
+    delete chartInstances[id];
+  }
+}
+
+function updateCharts(dcf) {
+  const gold = '#c9a84c';
+  const goldLight = '#e8cd87';
+  const green = '#2ecc71';
+  const red = '#e74c3c';
+  const blue = '#4a7fc1';
+  const purple = '#9b59b6';
+  const orange = '#e67e22';
+  const offWhite = '#f5f2ec';
+  const midGray = '#6b6560';
+  const darkBg = 'rgba(245,242,236,0.03)';
+  const gridColor = 'rgba(245,242,236,0.06)';
+  const fontFamily = "'IBM Plex Sans', sans-serif";
+
+  const chartOpts = (extra) => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: { color: offWhite, font: { family: fontFamily, size: 10 }, boxWidth: 12, padding: 10 }
+      },
+      tooltip: {
+        backgroundColor: '#1a1a1a',
+        titleColor: gold,
+        bodyColor: offWhite,
+        borderColor: gold,
+        borderWidth: 1,
+        cornerRadius: 3,
+        titleFont: { family: fontFamily, size: 11 },
+        bodyFont: { family: fontFamily, size: 11 }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: midGray, font: { family: fontFamily, size: 10 } },
+        grid: { color: gridColor }
+      },
+      y: {
+        ticks: { color: midGray, font: { family: fontFamily, size: 10 }, callback: v => (v >= 1000 ? (v/1000).toFixed(1)+'B' : v.toFixed(0)+'M') },
+        grid: { color: gridColor }
+      }
+    },
+    ...extra
+  });
+
+  // Chart 1: Revenue & EBITDA (revenue table chart)
+  destroyChart('revenueChart');
+  const revCtx = document.getElementById('revenueChart').getContext('2d');
+  const revYears = YEARS;
+  chartInstances['revenueChart'] = new Chart(revCtx, {
+    type: 'bar',
+    data: {
+      labels: revYears,
+      datasets: [
+        {
+          label: 'Revenue ($M)',
+          data: dcf.revenues,
+          backgroundColor: 'rgba(201,168,76,0.6)',
+          borderColor: gold,
+          borderWidth: 1,
+          borderRadius: 2,
+          order: 2
+        },
+        {
+          label: 'EBITDA ($M)',
+          data: dcf.ebitda,
+          type: 'line',
+          borderColor: green,
+          backgroundColor: 'rgba(46,204,113,0.1)',
+          fill: true,
+          tension: 0.3,
+          pointBackgroundColor: green,
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          borderWidth: 2,
+          order: 1
+        }
+      ]
+    },
+    options: chartOpts({
+      scales: {
+        x: {
+          ticks: { color: midGray, font: { family: fontFamily, size: 10 } },
+          grid: { color: gridColor }
+        },
+        y: {
+          ticks: { color: midGray, font: { family: fontFamily, size: 10 }, callback: v => (v >= 1000 ? '$'+(v/1000).toFixed(1)+'B' : '$'+v.toFixed(0)+'M') },
+          grid: { color: gridColor }
+        }
+      }
+    })
+  });
+
+  // Chart 2: FCF Chart (bars for FCF per year)
+  destroyChart('fcfChart');
+  const fcfCtx = document.getElementById('fcfChart').getContext('2d');
+  chartInstances['fcfChart'] = new Chart(fcfCtx, {
+    type: 'bar',
+    data: {
+      labels: YEARS.slice(1),
+      datasets: [{
+        label: 'Unlevered FCF ($M)',
+        data: dcf.fcf.slice(1),
+        backgroundColor: dcf.fcf.slice(1).map(v => v >= 0 ? 'rgba(46,204,113,0.6)' : 'rgba(231,76,60,0.6)'),
+        borderColor: dcf.fcf.slice(1).map(v => v >= 0 ? green : red),
+        borderWidth: 1,
+        borderRadius: 2
+      }]
+    },
+    options: chartOpts({})
+  });
+
+  // Chart 3: Waterfall Chart (Components)
+  destroyChart('waterfallChart');
+  const wfCtx = document.getElementById('waterfallChart').getContext('2d');
+  // Show stacked: Operating CF (NOPAT + D&A) positive, Total Invest (CapEx + NWC) negative
+  const opCf = dcf.nopat.map((n, i) => n + dcf.da[i]);
+  const totalInv = dcf.capex.map((c, i) => -(c + dcf.nwc[i]));
+  chartInstances['waterfallChart'] = new Chart(wfCtx, {
+    type: 'bar',
+    data: {
+      labels: YEARS,
+      datasets: [
+        {
+          label: 'Operating CF (NOPAT + D&A)',
+          data: opCf,
+          backgroundColor: 'rgba(46,204,113,0.5)',
+          borderColor: green,
+          borderWidth: 1,
+          borderRadius: 2
+        },
+        {
+          label: 'Total Investment (CapEx + ΔNWC)',
+          data: totalInv.map(v => -v),
+          backgroundColor: 'rgba(231,76,60,0.4)',
+          borderColor: red,
+          borderWidth: 1,
+          borderRadius: 2
+        },
+        {
+          label: 'Net FCF',
+          data: dcf.fcf,
+          type: 'line',
+          borderColor: gold,
+          backgroundColor: 'rgba(201,168,76,0.1)',
+          fill: false,
+          tension: 0.3,
+          pointBackgroundColor: gold,
+          pointRadius: 4,
+          borderWidth: 2,
+          order: 0
+        }
+      ]
+    },
+    options: chartOpts({})
+  });
+
+  // Chart 4: Valuation Bridge (horizontal bar)
+  destroyChart('bridgeChart');
+  const brCtx = document.getElementById('bridgeChart').getContext('2d');
+  const bridgeLabels = ['Enterprise Value', 'Less: Net Debt', 'Equity Value'];
+  const bridgeData = [dcf.ev, -state.netDebt, dcf.equityVal];
+  const bridgeColors = ['rgba(201,168,76,0.6)', 'rgba(231,76,60,0.5)', 'rgba(46,204,113,0.6)'];
+  const bridgeBorders = [gold, red, green];
+  chartInstances['bridgeChart'] = new Chart(brCtx, {
+    type: 'bar',
+    data: {
+      labels: bridgeLabels,
+      datasets: [{
+        label: 'Value ($M)',
+        data: bridgeData,
+        backgroundColor: bridgeColors,
+        borderColor: bridgeBorders,
+        borderWidth: 1,
+        borderRadius: 3
+      }]
+    },
+    options: chartOpts({
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => fmtM(ctx.raw)
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: midGray, font: { family: fontFamily, size: 10 }, callback: v => fmtM(v) },
+          grid: { color: gridColor }
+        }
+      }
+    })
+  });
+
+  // Charts in bottom section
+  // Revenue & Margin
+  destroyChart('chartRevMargin');
+  const rm1 = document.getElementById('chartRevMargin').getContext('2d');
+  const marginVals = [EBITDA_MARGIN_2025].concat(getProjection().ebitdaMargin);
+  chartInstances['chartRevMargin'] = new Chart(rm1, {
+    type: 'bar',
+    data: {
+      labels: YEARS,
+      datasets: [
+        {
+          label: 'Revenue ($M)',
+          data: dcf.revenues,
+          backgroundColor: 'rgba(201,168,76,0.5)',
+          borderColor: gold,
+          borderWidth: 1,
+          borderRadius: 2,
+          yAxisID: 'y',
+          order: 2
+        },
+        {
+          label: 'EBITDA Margin (%)',
+          data: marginVals,
+          type: 'line',
+          borderColor: green,
+          backgroundColor: 'rgba(46,204,113,0.1)',
+          fill: true,
+          tension: 0.3,
+          pointBackgroundColor: green,
+          pointRadius: 4,
+          borderWidth: 2,
+          yAxisID: 'y1',
+          order: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          labels: { color: offWhite, font: { family: fontFamily, size: 10 }, boxWidth: 12, padding: 10 }
+        },
+        tooltip: {
+          backgroundColor: '#1a1a1a',
+          titleColor: gold,
+          bodyColor: offWhite,
+          borderColor: gold,
+          borderWidth: 1,
+          cornerRadius: 3
+        }
+      },
+      scales: {
+        x: { ticks: { color: midGray }, grid: { color: gridColor } },
+        y: {
+          position: 'left',
+          ticks: { color: midGray, callback: v => (v >= 1000 ? '$'+(v/1000).toFixed(1)+'B' : '$'+v.toFixed(0)+'M') },
+          grid: { color: gridColor }
+        },
+        y1: {
+          position: 'right',
+          min: 0,
+          max: 60,
+          ticks: { color: midGray, callback: v => v.toFixed(0) + '%' },
+          grid: { display: false }
+        }
+      }
+    }
+  });
+
+  // FCF bars (bottom)
+  destroyChart('chartFCF');
+  const fcf2 = document.getElementById('chartFCF').getContext('2d');
+  chartInstances['chartFCF'] = new Chart(fcf2, {
+    type: 'bar',
+    data: {
+      labels: YEARS.slice(1),
+      datasets: [{
+        label: 'FCF ($M)',
+        data: dcf.fcf.slice(1),
+        backgroundColor: dcf.fcf.slice(1).map(v => v >= 0 ? 'rgba(46,204,113,0.6)' : 'rgba(231,76,60,0.6)'),
+        borderColor: dcf.fcf.slice(1).map(v => v >= 0 ? green : red),
+        borderWidth: 1,
+        borderRadius: 2
+      }]
+    },
+    options: chartOpts({})
+  });
+
+  // Bridge (bottom)
+  destroyChart('chartBridge');
+  const br2 = document.getElementById('chartBridge').getContext('2d');
+  chartInstances['chartBridge'] = new Chart(br2, {
+    type: 'bar',
+    data: {
+      labels: bridgeLabels,
+      datasets: [{
+        label: 'Value ($M)',
+        data: bridgeData,
+        backgroundColor: bridgeColors,
+        borderColor: bridgeBorders,
+        borderWidth: 1,
+        borderRadius: 3
+      }]
+    },
+    options: chartOpts({
+      indexAxis: 'y',
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => fmtM(ctx.raw) } }
+      },
+      scales: {
+        x: { ticks: { color: midGray, callback: v => fmtM(v) }, grid: { color: gridColor } }
+      }
+    })
+  });
+
+  // Sensitivity heatmap chart
+  destroyChart('chartSens');
+  const sensCtx = document.getElementById('chartSens').getContext('2d');
+  const tgs = [1.5, 2.25, 3.0, 3.75, 4.5];
+  const waccs = [8.5, 9.5, 10.5, 11.5, 12.5];
+  const sensData = waccs.map(w => tgs.map(t => {
+    const d = computeDCF(w, t);
+    return d.price > 0 ? d.price : 0;
+  }));
+  const maxPrice = Math.max(...sensData.flat());
+  const sensLabels = waccs.map(w => w.toFixed(1) + '%');
+
+  // Use a heatmap-like approach: create a bar chart with colored segments
+  // Since Chart.js doesn't have native heatmap, use dataset with pointBackgroundColor as a proxy
+  const heatData = [];
+  const heatLabels = [];
+  for (let wi = 0; wi < waccs.length; wi++) {
+    for (let ti = 0; ti < tgs.length; ti++) {
+      heatData.push(sensData[wi][ti]);
+      heatLabels.push('W' + waccs[wi] + '/G' + tgs[ti]);
+    }
+  }
+
+  chartInstances['chartSens'] = new Chart(sensCtx, {
+    type: 'bar',
+    data: {
+      labels: heatLabels,
+      datasets: [{
+        label: 'Implied Share Price',
+        data: heatData,
+        backgroundColor: heatData.map(v => {
+          const pct = maxPrice > 0 ? v / maxPrice : 0;
+          const r = Math.round(200 - pct * 170);
+          const g = Math.round(60 + pct * 100);
+          const b = Math.round(60 - pct * 40);
+          return 'rgba(' + r + ',' + g + ',' + b + ',0.7)';
+        }),
+        borderColor: heatData.map(v => {
+          const pct = maxPrice > 0 ? v / maxPrice : 0;
+          const r = Math.round(200 - pct * 170);
+          const g = Math.round(60 + pct * 100);
+          const b = Math.round(60 - pct * 40);
+          return 'rgb(' + r + ',' + g + ',' + b + ')';
+        }),
+        borderWidth: 1,
+        borderRadius: 2
+      }]
+    },
+    options: chartOpts({
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const idx = ctx.dataIndex;
+              const wi = Math.floor(idx / 5);
+              const ti = idx % 5;
+              return 'WACC ' + waccs[wi].toFixed(1) + '% / TG ' + tgs[ti].toFixed(2) + '%: ' + fmtPrice(ctx.raw);
+            },
+            title: () => ''
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: midGray, font: { size: 8 },
+            callback: (v, i) => {
+              // Show alternate labels to reduce clutter
+              return heatLabels[i];
+            }
+          },
+          grid: { color: gridColor }
+        }
+      }
+    })
+  });
+}
+
+// ===== EVENT LISTENERS =====
+function setupListeners() {
+  const sliderMap = [
+    { id: 'rf-slider', key: 'rf', display: 'rf-display', fmt: v => v.toFixed(2) + '%' },
+    { id: 'erp-slider', key: 'erp', display: 'erp-display', fmt: v => v.toFixed(2) + '%' },
+    { id: 'beta-slider', key: 'beta', display: 'beta-display', fmt: v => v.toFixed(2) },
+    { id: 'ptkd-slider', key: 'ptKd', display: 'ptkd-display', fmt: v => v.toFixed(2) + '%' },
+    { id: 'dw-slider', key: 'debtW', display: 'dw-display', fmt: v => v.toFixed(1) + '%' },
+    { id: 'trp-slider', key: 'taxProj', display: 'trp-display', fmt: v => v.toFixed(1) + '%' },
+    { id: 'trt-slider', key: 'taxTerm', display: 'trt-display', fmt: v => v.toFixed(1) + '%' },
+    { id: 'tg-slider', key: 'termG', display: 'tg-display', fmt: v => v.toFixed(2) + '%' }
+  ];
+
+  sliderMap.forEach(item => {
+    const el = document.getElementById(item.id);
+    if (!el) return;
+    el.addEventListener('input', function() {
+      const val = parseFloat(this.value);
+      state[item.key] = val;
+      document.getElementById(item.display).textContent = item.fmt(val);
+      updateAll();
+    });
+  });
+
+  // Number inputs
+  document.getElementById('net-debt').addEventListener('input', function() {
+    state.netDebt = parseFloat(this.value) || 0;
+    document.getElementById('nd-display').textContent = '$' + Number(state.netDebt).toLocaleString();
+    updateAll();
+  });
+  document.getElementById('shares-out').addEventListener('input', function() {
+    state.shares = parseFloat(this.value) || 1;
+    document.getElementById('so-display').textContent = Number(state.shares).toLocaleString();
+    updateAll();
+  });
+
+  // Scenario buttons
+  document.querySelectorAll('.scenario-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const sc = this.dataset.scenario;
+      document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      state.scenario = sc;
+      document.getElementById('custom-grid').classList.toggle('visible', sc === 'custom');
+      if (sc !== 'custom') {
+        updateAll();
+      } else {
+        // Sync custom sliders with current scenario values
+        syncCustomSliders();
+        updateAll();
+      }
+    });
+  });
+
+  // Custom sliders
+  const customSliderIds = [];
+  for (let i = 0; i < 5; i++) {
+    customSliderIds.push('cg-g' + i, 'cg-m' + i, 'cg-c' + i);
+  }
+  customSliderIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('input', function() {
+        // Switch to custom mode
+        if (state.scenario !== 'custom') {
+          state.scenario = 'custom';
+          document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+          document.querySelector('[data-scenario="custom"]').classList.add('active');
+          document.getElementById('custom-grid').classList.add('visible');
+          syncCustomSliders();
+        }
+        readCustomSliders();
+        updateAll();
+      });
+    }
+  });
+}
+
+function syncCustomSliders() {
+  const p = getProjection();
+  for (let i = 0; i < 5; i++) {
+    document.getElementById('cg-g' + i).value = p.growth[i];
+    document.getElementById('cg-g' + i + '-v').textContent = p.growth[i].toFixed(1) + '%';
+    document.getElementById('cg-m' + i).value = p.ebitdaMargin[i];
+    document.getElementById('cg-m' + i + '-v').textContent = p.ebitdaMargin[i].toFixed(1) + '%';
+    document.getElementById('cg-c' + i).value = p.capexPct[i];
+    document.getElementById('cg-c' + i + '-v').textContent = p.capexPct[i].toFixed(1) + '%';
+  }
+  state.customGrowth = [...p.growth];
+  state.customMargin = [...p.ebitdaMargin];
+  state.customCapex = [...p.capexPct];
+}
+
+function readCustomSliders() {
+  for (let i = 0; i < 5; i++) {
+    state.customGrowth[i] = parseFloat(document.getElementById('cg-g' + i).value);
+    document.getElementById('cg-g' + i + '-v').textContent = state.customGrowth[i].toFixed(1) + '%';
+    state.customMargin[i] = parseFloat(document.getElementById('cg-m' + i).value);
+    document.getElementById('cg-m' + i + '-v').textContent = state.customMargin[i].toFixed(1) + '%';
+    state.customCapex[i] = parseFloat(document.getElementById('cg-c' + i).value);
+    document.getElementById('cg-c' + i + '-v').textContent = state.customCapex[i].toFixed(1) + '%';
+  }
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', function() {
+  setupListeners();
+
+  // Set initial custom slider values
+  syncCustomSliders();
+
+  // Format number inputs on load
+  document.getElementById('nd-display').textContent = '$' + Number(state.netDebt).toLocaleString();
+  document.getElementById('so-display').textContent = Number(state.shares).toLocaleString();
+
+  updateAll();
+});
+</script>
+</body>
+</html>
